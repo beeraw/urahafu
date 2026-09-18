@@ -143,36 +143,36 @@ pub const PIXEL_TEST_STEP_GAP: f32 = 8.0;
 /// Height of the time-remaining bar.
 pub const BAR_HEIGHT: f32 = 2.0;
 
-/// The hold-to-unlock button's visual diameter (spec: "44 pt").
+/// The hold-to-unlock button's visual diameter (DESIGN.md §8: "44 pt").
 pub const UNLOCK_BUTTON_DIAMETER: f32 = 44.0;
 /// The hold-to-unlock button's visual radius.
 pub const UNLOCK_BUTTON_RADIUS: f32 = UNLOCK_BUTTON_DIAMETER / 2.0;
-/// The hold-to-unlock button's (circular) hit target diameter (spec: "hit target 64 pt").
+/// The hold-to-unlock button's (circular) hit target diameter (DESIGN.md §8: "hit target 64 pt").
 pub const UNLOCK_BUTTON_HIT_DIAMETER: f32 = 64.0;
 /// The hold-to-unlock button's hit target radius.
 pub const UNLOCK_BUTTON_HIT_RADIUS: f32 = UNLOCK_BUTTON_HIT_DIAMETER / 2.0;
-/// Gap between the second line's baseline and the top of the button's *visual* circle (spec:
-/// "20 pt gap").
+/// Gap between the second line's baseline and the top of the button's *visual* circle
+/// (DESIGN.md §8: "20 pt gap").
 const UNLOCK_BUTTON_GAP_ABOVE_SECOND_LINE: f32 = 20.0;
 /// Minimum clear space between the bottom of the button's visual circle and the screen's bottom
-/// edge (spec: "bottom margin ≥ 56 pt").
+/// edge (DESIGN.md §8: "bottom margin ≥ 56 pt").
 const UNLOCK_BUTTON_BOTTOM_MARGIN: f32 = 56.0;
 
-/// Countdown's hold-to-unlock explanation line font size (spec: "15 pt").
+/// Countdown's hold-to-unlock explanation line font size (DESIGN.md §7: "15 pt").
 pub const COUNTDOWN_UNLOCK_EXPLANATION_FONT_SIZE: f32 = 15.0;
 /// Vertical offset of the countdown's hold-to-unlock explanation line below the countdown
-/// digit's own anchor (spec: "under the digit area"). This is a fixed offset from the digit's
+/// digit's own anchor (DESIGN.md §7: "below the digit area"). This is a fixed offset from the digit's
 /// anchor position (screen center), not from its measured glyph metrics — unlike
 /// [`Layout::countdown_label_above`], which sits *above* the digit and does need the real
 /// rasterized cap top to avoid overlapping a tall digit, a line placed comfortably *below* the
 /// digit's center has no such risk for any digit 1-9 at this font's size.
 const COUNTDOWN_UNLOCK_EXPLANATION_BELOW_DIGIT: f32 = 130.0;
 
-/// The keyboard-only HUD's hold-to-unlock button visual diameter (spec: "28 pt").
+/// The keyboard-only HUD's hold-to-unlock button visual diameter (DESIGN.md §9: "28 pt").
 pub const HUD_UNLOCK_BUTTON_DIAMETER: f32 = 28.0;
 /// The keyboard-only HUD's hold-to-unlock button visual radius.
 pub const HUD_UNLOCK_BUTTON_RADIUS: f32 = HUD_UNLOCK_BUTTON_DIAMETER / 2.0;
-/// The keyboard-only HUD's hold-to-unlock button hit target diameter (spec: "hit 36 pt").
+/// The keyboard-only HUD's hold-to-unlock button hit target diameter (DESIGN.md §9: "hit 36 pt").
 pub const HUD_UNLOCK_BUTTON_HIT_DIAMETER: f32 = 36.0;
 /// The keyboard-only HUD's hold-to-unlock button hit target radius.
 pub const HUD_UNLOCK_BUTTON_HIT_RADIUS: f32 = HUD_UNLOCK_BUTTON_HIT_DIAMETER / 2.0;

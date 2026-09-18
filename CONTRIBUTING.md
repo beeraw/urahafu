@@ -33,6 +33,11 @@ See `docs/ARCHITECTURE.md` for the module layout and the contract between
 the `unsafe`), and `design/DESIGN.md` for the behavior and visuals any change
 to the cleaning overlay should match.
 
+Local builds are signed with `packaging/sign.sh`, which falls back to an
+ad-hoc signature when the project certificate isn't in your keychain. That's
+fine for development; just expect macOS to ask for the Accessibility
+permission again after each rebuild (see `SECURITY.md`, "Code signing").
+
 For anything that touches the input-blocking safety net specifically, please
 say so in the pull request description — those changes get extra scrutiny
 given the threat model in `SECURITY.md`.

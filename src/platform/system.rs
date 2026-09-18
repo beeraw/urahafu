@@ -1,12 +1,11 @@
-//! Small system queries that don't deserve their own module: the Option key held at launch
-//! (DESIGN.md §6), the user's preferred languages (for `core::i18n::Language::from_preferred`),
-//! opening a URL, and locating the home directory.
+//! Small system queries that don't deserve their own module: the user's preferred languages (for
+//! `core::i18n::Language::from_preferred`), opening a URL, and locating the home directory.
 
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::platform::ffi::{events, locale};
+use crate::platform::ffi::locale;
 
 /// Errors from the small system operations in this module.
 #[derive(Debug, thiserror::Error)]
@@ -23,14 +22,6 @@ pub enum SystemError {
     /// `$HOME` is not set, or set to an empty string.
     #[error("could not determine the home directory: $HOME is not set")]
     NoHomeDirectory,
-}
-
-/// Whether the Option/Alt key is currently held, combined across the whole session (not just this
-/// process's own synthesized events) — used to reopen the menu after the icon has been hidden
-/// (DESIGN.md §6).
-#[must_use]
-pub fn option_key_held() -> bool {
-    events::combined_session_flags() & events::ALTERNATE_MASK != 0
 }
 
 /// The user's preferred languages, most preferred first (e.g. `["fr-FR", "en-US"]`), straight

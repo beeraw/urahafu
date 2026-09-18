@@ -12,11 +12,18 @@
 //! `NX_SYSDEFINED` (media/volume/brightness keys) are all captured and swallowed. Trackpad
 //! gesture events (pinch/rotate/swipe, plus the generic "gesture" envelope — undocumented
 //! `NSEventType` values not in the public `CGEventType` enum, see
-//! `src/platform/ffi/event_tap.rs`) are captured and swallowed too, mapped to [`InputEvent::Key`]
-//! like system-defined keys, since the session state machine has no separate "gesture" concept.
-//! **Plain pointer movement (no button held) is deliberately left alone** — the hold-to-unlock
-//! button's hover reveal reads it via winit's `CursorMoved` instead (`src/app/`), and blocking
-//! `mouseMoved` at the tap would also block the OS's own cursor rendering for no benefit.
+//! `src/platform/ffi/event_tap.rs`) are captured and swallowed too, mapped to
+//! [`InputEvent::KeyDown`] (`KeyKind::Other`) like system-defined keys, since the session state
+//! machine has no separate "gesture" concept. **Plain pointer movement (no button held) is
+//! deliberately left alone** — the hold-to-unlock button's hover reveal reads it via winit's
+//! `CursorMoved` instead (`src/app/`), and blocking `mouseMoved` at the tap would also block the
+//! OS's own cursor rendering for no benefit.
+//!
+//! Key down and key up are both forwarded now (DESIGN.md §8, the Esc+Return unlock combo):
+//! a key-down event carries whether it is an OS-generated autorepeat
+//! (`kCGKeyboardEventAutorepeat`), and a modifier-flag change (`kCGEventFlagsChanged`) is
+//! forwarded too, as [`InputEvent::ModifierChange`] — neither carries a character or, for
+//! `ModifierChange`, even which modifier changed; see `core::combo`'s module docs for why.
 //!
 //! ## Threading
 //!
@@ -36,7 +43,7 @@ use std::time::{Duration, Instant};
 use core_foundation::runloop::CFRunLoop;
 use core_graphics::event::EventField;
 
-use crate::core::session::InputEvent;
+use crate::core::session::{InputEvent, KeyKind};
 use crate::platform::ffi::event_tap::{
     self, CGEventRef, RawTap, TAP_LOCATION_SESSION, TAP_OPTION_DEFAULT, TAP_PLACEMENT_HEAD_INSERT,
     TapAction, TapHandle, build_mask, event_type,
@@ -53,6 +60,11 @@ const POLL_INTERVAL: Duration = Duration::from_millis(50);
 
 /// Virtual key code of the Escape key (`kVK_Escape`), constant across keyboard layouts.
 const KEYCODE_ESCAPE: i64 = 53;
+/// Virtual key code of the Return key (`kVK_Return`), constant across keyboard layouts.
+const KEYCODE_RETURN: i64 = 36;
+/// Virtual key code of the numeric keypad's Enter key (`kVK_ANSI_KeypadEnter`), constant across
+/// keyboard layouts; counts as Return for the Esc+Return unlock combo (DESIGN.md §8).
+const KEYCODE_KEYPAD_ENTER: i64 = 76;
 /// Virtual key code of the Space bar (`kVK_Space`), constant across keyboard layouts.
 const KEYCODE_SPACE: i64 = 49;
 
@@ -239,8 +251,18 @@ fn dispatch_event(etype: u32, event: CGEventRef, tx: &Sender<InputEvent>) -> Tap
     let mapped = match etype {
         event_type::KEY_DOWN => {
             let keycode = event_tap::integer_value_field(event, EventField::KEYBOARD_EVENT_KEYCODE);
-            Some(map_key_event(keycode))
+            let repeat =
+                event_tap::integer_value_field(event, EventField::KEYBOARD_EVENT_AUTOREPEAT) != 0;
+            Some(InputEvent::KeyDown {
+                kind: map_key_kind(keycode),
+                repeat,
+            })
         }
+        event_type::KEY_UP => {
+            let keycode = event_tap::integer_value_field(event, EventField::KEYBOARD_EVENT_KEYCODE);
+            Some(InputEvent::KeyUp(map_key_kind(keycode)))
+        }
+        event_type::FLAGS_CHANGED => Some(InputEvent::ModifierChange),
         event_type::LEFT_MOUSE_DOWN
         | event_type::RIGHT_MOUSE_DOWN
         | event_type::OTHER_MOUSE_DOWN => {
@@ -262,10 +284,11 @@ fn dispatch_event(etype: u32, event: CGEventRef, tx: &Sender<InputEvent>) -> Tap
         | event_type::ROTATE
         | event_type::GESTURE
         | event_type::MAGNIFY
-        | event_type::SWIPE => Some(InputEvent::Key),
-        // keyUp/flagsChanged are swallowed without ever being translated or sent — the hold
-        // state machine only ever needs to see one event per keystroke. Anything else is
-        // unreachable given the tap's mask, but swallowed defensively all the same.
+        | event_type::SWIPE => Some(InputEvent::KeyDown {
+            kind: KeyKind::Other,
+            repeat: false,
+        }),
+        // Unreachable given the tap's mask, but swallowed defensively all the same.
         _ => None,
     };
     if let Some(input_event) = mapped {
@@ -276,15 +299,17 @@ fn dispatch_event(etype: u32, event: CGEventRef, tx: &Sender<InputEvent>) -> Tap
     TapAction::Swallow
 }
 
-/// Maps a raw virtual key code to a session [`InputEvent`]. No character is ever decoded or kept
-/// — the hold-to-unlock button needs none (`docs/ARCHITECTURE.md` goal 2). Pure, so it is
-/// unit-tested without a real event tap.
+/// Maps a raw virtual key code to a [`KeyKind`]. No character is ever decoded or kept — the
+/// hold-to-unlock button and the Esc+Return combo need none (`docs/ARCHITECTURE.md` goal 2). Pure,
+/// so it is unit-tested without a real event tap. The numeric keypad's Enter key
+/// (`kVK_ANSI_KeypadEnter`) maps to [`KeyKind::Return`] too — it counts as Return for the combo.
 #[must_use]
-pub fn map_key_event(keycode: i64) -> InputEvent {
+pub fn map_key_kind(keycode: i64) -> KeyKind {
     match keycode {
-        KEYCODE_ESCAPE => InputEvent::Escape,
-        KEYCODE_SPACE => InputEvent::Space,
-        _ => InputEvent::Key,
+        KEYCODE_ESCAPE => KeyKind::Escape,
+        KEYCODE_RETURN | KEYCODE_KEYPAD_ENTER => KeyKind::Return,
+        KEYCODE_SPACE => KeyKind::Space,
+        _ => KeyKind::Other,
     }
 }
 
@@ -376,18 +401,28 @@ mod tests {
 
     #[test]
     fn escape_keycode_maps_to_escape() {
-        assert_eq!(map_key_event(KEYCODE_ESCAPE), InputEvent::Escape);
+        assert_eq!(map_key_kind(KEYCODE_ESCAPE), KeyKind::Escape);
     }
 
     #[test]
     fn space_keycode_maps_to_space() {
-        assert_eq!(map_key_event(KEYCODE_SPACE), InputEvent::Space);
+        assert_eq!(map_key_kind(KEYCODE_SPACE), KeyKind::Space);
     }
 
     #[test]
-    fn every_other_keycode_maps_to_key() {
-        assert_eq!(map_key_event(0), InputEvent::Key); // 'a' on QWERTY
-        assert_eq!(map_key_event(122), InputEvent::Key); // e.g. F1
-        assert_eq!(map_key_event(-1), InputEvent::Key);
+    fn return_keycode_maps_to_return() {
+        assert_eq!(map_key_kind(KEYCODE_RETURN), KeyKind::Return);
+    }
+
+    #[test]
+    fn keypad_enter_keycode_also_maps_to_return() {
+        assert_eq!(map_key_kind(KEYCODE_KEYPAD_ENTER), KeyKind::Return);
+    }
+
+    #[test]
+    fn every_other_keycode_maps_to_other() {
+        assert_eq!(map_key_kind(0), KeyKind::Other); // 'a' on QWERTY
+        assert_eq!(map_key_kind(122), KeyKind::Other); // e.g. F1
+        assert_eq!(map_key_kind(-1), KeyKind::Other);
     }
 }

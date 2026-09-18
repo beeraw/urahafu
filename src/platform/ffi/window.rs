@@ -76,10 +76,11 @@ pub fn round_window_corners(window: &Window, corner_radius: f64) -> bool {
 #[cfg(test)]
 mod tests {
     // `round_window_corners` needs a live `NSView`/`NSWindow` behind a real `winit` window,
-    // which is not available in a headless test run (no GUI session here) — see this module's
-    // final-report note on how this was instead verified against the real `objc2-app-kit`
-    // method signatures. Nothing here to unit-test without a display; this empty module exists
-    // so the crate's `#[cfg(test)]` convention (one test module per platform file) still holds.
+    // which is not available in a headless test run (no GUI session here); it was instead
+    // verified by reviewing the real `objc2-app-kit` method signatures it calls against Apple's
+    // documented `NSView`/`NSWindow`/`CALayer` APIs. Nothing here to unit-test without a display;
+    // this empty module exists so the crate's `#[cfg(test)]` convention (one test module per
+    // platform file) still holds.
     use super::*;
 
     #[test]

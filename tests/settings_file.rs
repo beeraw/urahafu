@@ -69,7 +69,6 @@ fn full_first_run_flow_creates_defaults_then_persists_changes() {
         failsafe: FailsafeDelay::Seconds30,
         keyboard_only: true,
         show_menu_bar_icon: false,
-        welcome_seen: true,
     };
     updated
         .save(&path)

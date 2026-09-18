@@ -48,7 +48,7 @@ use urahafu::core::countdown::Countdown;
 use urahafu::core::failsafe::FailsafeDelay;
 use urahafu::core::i18n::Language;
 use urahafu::core::layout::{self, Layout, ScreenSize};
-use urahafu::core::session::{InputEvent, Session, SessionConfig};
+use urahafu::core::session::{InputEvent, KeyKind, Session, SessionConfig};
 use urahafu::platform::render::{self, Appearance, ScreenRole};
 use urahafu::platform::text::TextRasterizer;
 
@@ -299,7 +299,13 @@ fn render_cleaning_white(rasterizer: &mut TextRasterizer, out_dir: &std::path::P
     );
     let locked_at = start + Countdown::TOTAL;
     session.tick(locked_at);
-    session.handle_input(InputEvent::Key, locked_at);
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Other,
+            repeat: false,
+        },
+        locked_at,
+    );
     // A blocked key re-shows the hint from opacity 0 (DESIGN.md §8: 200 ms fade-in on every
     // blocked input, `HintFader::on_input`); viewing at `locked_at` itself would catch that
     // fade-in at its very first frame (opacity 0, hint invisible) even though every other
@@ -348,8 +354,20 @@ fn render_pixel_test(rasterizer: &mut TextRasterizer, out_dir: &std::path::Path)
     let locked_at = start + Countdown::TOTAL;
     session.tick(locked_at);
     // Off -> Red -> Green: two Space presses.
-    session.handle_input(InputEvent::Space, locked_at);
-    session.handle_input(InputEvent::Space, locked_at);
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Space,
+            repeat: false,
+        },
+        locked_at,
+    );
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Space,
+            repeat: false,
+        },
+        locked_at,
+    );
     let view = session.view(locked_at);
 
     let mut buffer = pixel_buffer();
@@ -398,7 +416,13 @@ fn render_keyboard_only(
     );
     let locked_at = start + Countdown::TOTAL;
     session.tick(locked_at);
-    session.handle_input(InputEvent::Key, locked_at);
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Other,
+            repeat: false,
+        },
+        locked_at,
+    );
 
     // The HUD button's target depends on the pill's width, which in turn depends on the HUD's
     // own content (language, remaining time) — compute it from a first view, exactly as the app

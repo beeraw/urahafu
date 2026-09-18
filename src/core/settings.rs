@@ -77,9 +77,6 @@ pub struct Settings {
     pub keyboard_only: bool,
     /// Whether to show the menu bar icon. Default: `true`.
     pub show_menu_bar_icon: bool,
-    /// Whether the first-launch welcome alert (DESIGN.md §10) has already been shown. Default:
-    /// `false`.
-    pub welcome_seen: bool,
 }
 
 impl Default for Settings {
@@ -89,7 +86,6 @@ impl Default for Settings {
             failsafe: FailsafeDelay::Seconds60,
             keyboard_only: false,
             show_menu_bar_icon: true,
-            welcome_seen: false,
         }
     }
 }
@@ -146,11 +142,6 @@ impl Settings {
                         settings.show_menu_bar_icon = b;
                     }
                 }
-                "welcome_seen" => {
-                    if let Some(b) = parse_bool(value) {
-                        settings.welcome_seen = b;
-                    }
-                }
                 _ => {}
             }
         }
@@ -168,7 +159,6 @@ impl Settings {
         let _ = writeln!(out, "failsafe_seconds = {}", self.failsafe.seconds());
         let _ = writeln!(out, "keyboard_only = {}", self.keyboard_only);
         let _ = writeln!(out, "show_menu_bar_icon = {}", self.show_menu_bar_icon);
-        let _ = writeln!(out, "welcome_seen = {}", self.welcome_seen);
         out
     }
 
@@ -279,7 +269,6 @@ mod tests {
         assert_eq!(settings.failsafe, FailsafeDelay::Seconds60);
         assert!(!settings.keyboard_only);
         assert!(settings.show_menu_bar_icon);
-        assert!(!settings.welcome_seen);
     }
 
     #[test]
@@ -289,7 +278,6 @@ mod tests {
             failsafe: FailsafeDelay::Seconds30,
             keyboard_only: true,
             show_menu_bar_icon: false,
-            welcome_seen: true,
         };
         let parsed = Settings::parse(&settings.serialize());
         assert_eq!(parsed, settings);
@@ -297,7 +285,7 @@ mod tests {
 
     #[test]
     fn parse_falls_back_to_defaults_for_garbage_values() {
-        let contents = "color = purple\nfailsafe_seconds = 12\nkeyboard_only = maybe\nshow_menu_bar_icon = nope\nwelcome_seen = nope\n";
+        let contents = "color = purple\nfailsafe_seconds = 12\nkeyboard_only = maybe\nshow_menu_bar_icon = nope\n";
         let settings = Settings::parse(contents);
         assert_eq!(settings, Settings::default());
     }
@@ -370,7 +358,6 @@ mod tests {
             failsafe: FailsafeDelay::Seconds90,
             keyboard_only: true,
             show_menu_bar_icon: false,
-            welcome_seen: true,
         };
         settings
             .save(&path)
@@ -408,24 +395,12 @@ mod tests {
     }
 
     #[test]
-    fn parse_reads_welcome_seen() {
-        let settings = Settings::parse("welcome_seen = true\n");
-        assert!(settings.welcome_seen);
-    }
-
-    #[test]
-    fn welcome_seen_round_trips_through_save_and_load() {
-        let dir = TempDir::new("welcome-seen-round-trip");
-        let path = dir.path().join("settings.conf");
-
-        let settings = Settings {
-            welcome_seen: true,
-            ..Settings::default()
-        };
-        settings.save(&path).expect("save should succeed");
-
-        let loaded = Settings::load(&path).expect("load should succeed");
-        assert!(loaded.welcome_seen);
+    fn parse_ignores_the_removed_welcome_seen_key() {
+        // A settings file written by an older Urahafu still has this key; the loader must keep
+        // ignoring it rather than failing (DESIGN.md "Settings window" › "Removed": the loader
+        // silently ignores it, so old files keep loading).
+        let settings = Settings::parse("color = white\nwelcome_seen = true\n");
+        assert_eq!(settings.color, CleaningColor::White);
     }
 
     #[test]

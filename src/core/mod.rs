@@ -5,10 +5,12 @@
 pub mod canvas;
 pub mod clock;
 pub mod color;
+pub mod combo;
 pub mod countdown;
 pub mod easing;
 pub mod failsafe;
 pub mod hint;
+pub mod hold_ring;
 pub mod i18n;
 pub mod layout;
 pub mod login_item;

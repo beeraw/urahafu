@@ -1,17 +1,14 @@
-//! Menu bar tray icon and menu (DESIGN.md §6).
+//! Menu bar tray icon and reduced menu (DESIGN.md §6).
 //!
-//! [`Tray`] owns the `tray-icon` menu built exactly per DESIGN.md §6's item order/separators, and
-//! keeps it in sync with [`crate::core::settings::Settings`] via [`Tray::update`]. Every visible
-//! label comes from [`crate::core::i18n::Text`] — nothing here is a literal user-facing string.
-//! `tray-icon`/`muda` have no built-in "radio group" menu item: the Color and Auto-Unlock
-//! submenus' single-choice behavior is implemented by hand in [`Tray::update`], which unchecks
-//! every sibling before checking the selected one.
+//! [`Tray`] owns the `tray-icon` menu, kept to: "Allow Accessibility Access…" (+ separator, only
+//! while access is missing), "Clean Screen"/"Clean Keyboard", a separator, "Settings…" (opens the
+//! settings window), a separator, and "Quit". Every other former menu item (color, auto-unlock,
+//! keyboard-only, show/hide icon, open at login, about, source code) now lives in the settings
+//! window instead. Every visible label comes from [`crate::core::i18n::Text`].
 
-use tray_icon::menu::{CheckMenuItem, Menu, MenuEvent, MenuId, MenuItem, PredefinedMenuItem};
+use tray_icon::menu::{Menu, MenuEvent, MenuId, MenuItem, PredefinedMenuItem};
 use tray_icon::{Icon, TrayIcon, TrayIconBuilder};
 
-use crate::core::color::CleaningColor;
-use crate::core::failsafe::FailsafeDelay;
 use crate::core::i18n::{Language, Text};
 use crate::core::settings::Settings;
 
@@ -37,93 +34,52 @@ pub enum TrayError {
     Tray(#[from] tray_icon::Error),
 }
 
-/// A command produced by a click on the tray menu, decoded from a [`MenuEvent`] by
+/// A command produced by a click on the reduced tray menu, decoded from a [`MenuEvent`] by
 /// [`Tray::command_for`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TrayCommand {
-    /// Item 0: opens System Settings on the Accessibility pane. Only present in the menu while
-    /// Accessibility access is missing (DESIGN.md §6, §10).
+    /// Opens System Settings on the Accessibility pane. Only present in the menu while
+    /// Accessibility access is missing.
     GrantAccess,
-    /// Item 1: start a cleaning session (screen or keyboard-only, depending on the current mode).
+    /// Start a cleaning session (screen or keyboard-only, depending on the current mode).
     Clean,
-    /// Item 2: toggle keyboard-only mode.
-    ToggleKeyboardOnly,
-    /// Item 3 submenu: pick the cleaning color.
-    SetColor(CleaningColor),
-    /// Item 4 submenu: pick the fail-safe auto-unlock delay.
-    SetFailsafe(FailsafeDelay),
-    /// Item 5: toggle showing the menu bar icon.
-    ToggleShowIcon,
-    /// Item 6: toggle the login item.
-    ToggleLogin,
-    /// Item 7: show the About alert.
-    About,
-    /// Item 8: open the GitHub repository.
-    OpenRepository,
-    /// Item 9: quit the app.
+    /// Opens the settings window.
+    Settings,
+    /// Quit the app.
     Quit,
 }
 
 const ID_GRANT_ACCESS: &str = "grant_access";
 const ID_CLEAN: &str = "clean";
-const ID_KEYBOARD_ONLY: &str = "keyboard_only";
-const ID_COLOR_BLACK: &str = "color.black";
-const ID_COLOR_WHITE: &str = "color.white";
-const ID_FAILSAFE_30: &str = "failsafe.30";
-const ID_FAILSAFE_60: &str = "failsafe.60";
-const ID_FAILSAFE_90: &str = "failsafe.90";
-const ID_SHOW_ICON: &str = "show_icon";
-const ID_LOGIN: &str = "login";
-const ID_ABOUT: &str = "about";
-const ID_SOURCE: &str = "source";
+const ID_SETTINGS: &str = "settings";
 const ID_QUIT: &str = "quit";
 
-/// Owns the menu bar tray icon and menu, built per DESIGN.md §6.
+/// Owns the menu bar tray icon and reduced menu, built per DESIGN.md §6.
 pub struct Tray {
     icon: TrayIcon,
     language: Language,
     /// A cheap handle to the same native menu as `icon`'s (`muda::Menu` is a `Clone`-able
     /// reference type), kept around so [`Tray::update`] can insert/remove the "Allow
-    /// Accessibility Access…" item and its separator (item 0, DESIGN.md §6) as the permission
-    /// state changes, without rebuilding the whole menu.
+    /// Accessibility Access…" item and its separator as the permission state changes, without
+    /// rebuilding the whole menu.
     menu: Menu,
     grant_access_item: MenuItem,
     grant_access_separator: PredefinedMenuItem,
     /// Whether `grant_access_item`/`grant_access_separator` are currently inserted into `menu`.
     grant_access_visible: bool,
     clean_item: MenuItem,
-    keyboard_only_item: CheckMenuItem,
-    color_black: CheckMenuItem,
-    color_white: CheckMenuItem,
-    failsafe_30: CheckMenuItem,
-    failsafe_60: CheckMenuItem,
-    failsafe_90: CheckMenuItem,
-    show_icon_item: CheckMenuItem,
-    login_item: CheckMenuItem,
 }
 
 impl Tray {
-    /// Builds and shows the tray icon/menu for `settings`/`language`/`login_enabled`.
-    /// `trusted` (`permission::is_trusted()` at construction time) decides whether item 0,
-    /// "Allow Accessibility Access…", starts out in the menu (DESIGN.md §6, §10).
+    /// Builds and shows the tray icon/menu for `settings`/`language`. `trusted`
+    /// (`permission::is_trusted()` at construction time) decides whether "Allow Accessibility
+    /// Access…" starts out in the menu.
     ///
     /// # Errors
     ///
     /// Returns [`TrayError`] if the embedded icon is malformed, building the menu fails, or
     /// creating the tray icon itself fails.
-    #[allow(
-        clippy::too_many_lines,
-        reason = "constructing every menu item in DESIGN.md §6's fixed, ordered item list is \
-                  inherently a long, linear sequence; splitting it into helpers would only move \
-                  the same lines elsewhere, not reduce the coupling between an item and its place \
-                  in the menu"
-    )]
-    pub fn new(
-        settings: &Settings,
-        language: Language,
-        login_enabled: bool,
-        trusted: bool,
-    ) -> Result<Self, TrayError> {
+    pub fn new(settings: &Settings, language: Language, trusted: bool) -> Result<Self, TrayError> {
         let icon = Icon::from_rgba(
             MENUBAR_ICON_RGBA.to_vec(),
             MENUBAR_ICON_SIZE,
@@ -139,83 +95,8 @@ impl Tray {
         let grant_access_separator = PredefinedMenuItem::separator();
 
         let clean_item = MenuItem::with_id(ID_CLEAN, clean_label(*settings, language), true, None);
-        let keyboard_only_item = CheckMenuItem::with_id(
-            ID_KEYBOARD_ONLY,
-            Text::MenuKeyboardOnlyMode.get(language),
-            true,
-            settings.keyboard_only,
-            None,
-        );
-
-        let color_black = CheckMenuItem::with_id(
-            ID_COLOR_BLACK,
-            Text::MenuColorBlack.get(language),
-            true,
-            settings.color == CleaningColor::Black,
-            None,
-        );
-        let color_white = CheckMenuItem::with_id(
-            ID_COLOR_WHITE,
-            Text::MenuColorWhite.get(language),
-            true,
-            settings.color == CleaningColor::White,
-            None,
-        );
-        let color_menu =
-            tray_icon::menu::Submenu::with_id("color", Text::MenuColor.get(language), true);
-        color_menu.append(&color_black)?;
-        color_menu.append(&color_white)?;
-
-        let failsafe_30 = CheckMenuItem::with_id(
-            ID_FAILSAFE_30,
-            Text::MenuAutoUnlockAfter30s.get(language),
-            true,
-            settings.failsafe == FailsafeDelay::Seconds30,
-            None,
-        );
-        let failsafe_60 = CheckMenuItem::with_id(
-            ID_FAILSAFE_60,
-            Text::MenuAutoUnlockAfter60s.get(language),
-            true,
-            settings.failsafe == FailsafeDelay::Seconds60,
-            None,
-        );
-        let failsafe_90 = CheckMenuItem::with_id(
-            ID_FAILSAFE_90,
-            Text::MenuAutoUnlockAfter90s.get(language),
-            true,
-            settings.failsafe == FailsafeDelay::Seconds90,
-            None,
-        );
-        let failsafe_menu = tray_icon::menu::Submenu::with_id(
-            "auto_unlock",
-            Text::MenuAutoUnlock.get(language),
-            true,
-        );
-        failsafe_menu.append(&failsafe_30)?;
-        failsafe_menu.append(&failsafe_60)?;
-        failsafe_menu.append(&failsafe_90)?;
-
-        let show_icon_item = CheckMenuItem::with_id(
-            ID_SHOW_ICON,
-            Text::MenuShowIcon.get(language),
-            true,
-            settings.show_menu_bar_icon,
-            None,
-        );
-        // DESIGN.md §6: "Open at Login" is disabled (not just unchecked) when the menu bar
-        // icon is hidden, since there is then no menu left to reach it from.
-        let login_item = CheckMenuItem::with_id(
-            ID_LOGIN,
-            Text::MenuOpenAtLogin.get(language),
-            settings.show_menu_bar_icon,
-            login_enabled,
-            None,
-        );
-
-        let about_item = MenuItem::with_id(ID_ABOUT, Text::MenuAbout.get(language), true, None);
-        let source_item =
-            MenuItem::with_id(ID_SOURCE, Text::MenuSourceCode.get(language), true, None);
+        let settings_item =
+            MenuItem::with_id(ID_SETTINGS, Text::MenuSettings.get(language), true, None);
         let quit_item = MenuItem::with_id(ID_QUIT, Text::MenuQuit.get(language), true, None);
 
         let menu = Menu::new();
@@ -224,16 +105,8 @@ impl Tray {
             menu.append(&grant_access_separator)?;
         }
         menu.append(&clean_item)?;
-        menu.append(&keyboard_only_item)?;
         menu.append(&PredefinedMenuItem::separator())?;
-        menu.append(&color_menu)?;
-        menu.append(&failsafe_menu)?;
-        menu.append(&PredefinedMenuItem::separator())?;
-        menu.append(&show_icon_item)?;
-        menu.append(&login_item)?;
-        menu.append(&PredefinedMenuItem::separator())?;
-        menu.append(&about_item)?;
-        menu.append(&source_item)?;
+        menu.append(&settings_item)?;
         menu.append(&PredefinedMenuItem::separator())?;
         menu.append(&quit_item)?;
 
@@ -252,22 +125,13 @@ impl Tray {
             grant_access_separator,
             grant_access_visible: !trusted,
             clean_item,
-            keyboard_only_item,
-            color_black,
-            color_white,
-            failsafe_30,
-            failsafe_60,
-            failsafe_90,
-            show_icon_item,
-            login_item,
         })
     }
 
-    /// Refreshes every check mark, the dynamic "Clean Screen"/"Clean Keyboard" label, the
-    /// "Open at Login" item's enabled state, and item 0's presence, after `settings`,
-    /// `login_enabled` or `trusted` changed elsewhere (e.g. the user toggled something, a setting
-    /// was loaded from disk, or the permission watcher — DESIGN.md §10 — observed a change).
-    pub fn update(&mut self, settings: &Settings, login_enabled: bool, trusted: bool) {
+    /// Refreshes the "Clean Screen"/"Clean Keyboard" label and the "Allow Accessibility Access…"
+    /// item's presence, after `settings` or `trusted` changed elsewhere (the settings window, or
+    /// the permission watcher observing a change).
+    pub fn update(&mut self, settings: &Settings, trusted: bool) {
         if trusted && self.grant_access_visible {
             if let Err(err) = self.menu.remove(&self.grant_access_separator) {
                 eprintln!("urahafu: failed to remove the grant-access menu separator: {err}");
@@ -288,23 +152,6 @@ impl Tray {
 
         self.clean_item
             .set_text(clean_label(*settings, self.language));
-        self.keyboard_only_item.set_checked(settings.keyboard_only);
-
-        self.color_black
-            .set_checked(settings.color == CleaningColor::Black);
-        self.color_white
-            .set_checked(settings.color == CleaningColor::White);
-
-        self.failsafe_30
-            .set_checked(settings.failsafe == FailsafeDelay::Seconds30);
-        self.failsafe_60
-            .set_checked(settings.failsafe == FailsafeDelay::Seconds60);
-        self.failsafe_90
-            .set_checked(settings.failsafe == FailsafeDelay::Seconds90);
-
-        self.show_icon_item.set_checked(settings.show_menu_bar_icon);
-        self.login_item.set_enabled(settings.show_menu_bar_icon);
-        self.login_item.set_checked(login_enabled);
     }
 
     /// Access to the underlying `tray-icon` handle, if platform code needs it directly (e.g. to
@@ -324,24 +171,15 @@ impl Tray {
         match id.as_ref() {
             ID_GRANT_ACCESS => Some(TrayCommand::GrantAccess),
             ID_CLEAN => Some(TrayCommand::Clean),
-            ID_KEYBOARD_ONLY => Some(TrayCommand::ToggleKeyboardOnly),
-            ID_COLOR_BLACK => Some(TrayCommand::SetColor(CleaningColor::Black)),
-            ID_COLOR_WHITE => Some(TrayCommand::SetColor(CleaningColor::White)),
-            ID_FAILSAFE_30 => Some(TrayCommand::SetFailsafe(FailsafeDelay::Seconds30)),
-            ID_FAILSAFE_60 => Some(TrayCommand::SetFailsafe(FailsafeDelay::Seconds60)),
-            ID_FAILSAFE_90 => Some(TrayCommand::SetFailsafe(FailsafeDelay::Seconds90)),
-            ID_SHOW_ICON => Some(TrayCommand::ToggleShowIcon),
-            ID_LOGIN => Some(TrayCommand::ToggleLogin),
-            ID_ABOUT => Some(TrayCommand::About),
-            ID_SOURCE => Some(TrayCommand::OpenRepository),
+            ID_SETTINGS => Some(TrayCommand::Settings),
             ID_QUIT => Some(TrayCommand::Quit),
             _ => None,
         }
     }
 }
 
-/// Item 1's dynamic label (DESIGN.md §6): "Clean Screen" normally, "Clean Keyboard" when
-/// keyboard-only mode is active.
+/// The Clean item's dynamic label: "Clean Screen" normally, "Clean Keyboard" when keyboard-only
+/// mode is active.
 fn clean_label(settings: Settings, language: Language) -> &'static str {
     if settings.keyboard_only {
         Text::MenuCleanKeyboard.get(language)
@@ -371,33 +209,12 @@ mod tests {
     #[test]
     fn command_for_maps_every_known_id() {
         // `MenuEvent` has no public constructor in `muda`, so this test only checks the id
-        // strings resolve through the same match `command_for` uses, by re-deriving expected
-        // commands via `Tray::command_for`'s logic surface indirectly: the id constants
-        // themselves are private to this module, so exercise them through the public ids used
-        // when building the menu (the `ID_*` constants), asserting each maps to a distinct,
-        // non-overlapping command via a lightweight re-implementation check.
+        // strings resolve through the same match `command_for` uses, exercised through the
+        // public ids used when building the menu (the `ID_*` constants).
         let ids_and_commands = [
             (ID_GRANT_ACCESS, TrayCommand::GrantAccess),
             (ID_CLEAN, TrayCommand::Clean),
-            (ID_KEYBOARD_ONLY, TrayCommand::ToggleKeyboardOnly),
-            (ID_COLOR_BLACK, TrayCommand::SetColor(CleaningColor::Black)),
-            (ID_COLOR_WHITE, TrayCommand::SetColor(CleaningColor::White)),
-            (
-                ID_FAILSAFE_30,
-                TrayCommand::SetFailsafe(FailsafeDelay::Seconds30),
-            ),
-            (
-                ID_FAILSAFE_60,
-                TrayCommand::SetFailsafe(FailsafeDelay::Seconds60),
-            ),
-            (
-                ID_FAILSAFE_90,
-                TrayCommand::SetFailsafe(FailsafeDelay::Seconds90),
-            ),
-            (ID_SHOW_ICON, TrayCommand::ToggleShowIcon),
-            (ID_LOGIN, TrayCommand::ToggleLogin),
-            (ID_ABOUT, TrayCommand::About),
-            (ID_SOURCE, TrayCommand::OpenRepository),
+            (ID_SETTINGS, TrayCommand::Settings),
             (ID_QUIT, TrayCommand::Quit),
         ];
         let mut seen = std::collections::HashSet::new();

@@ -23,7 +23,10 @@ pub fn launch_agent_path(home: &Path) -> PathBuf {
 ///
 /// `RunAtLoad` starts the app immediately when the agent is loaded (i.e. at the next login);
 /// `KeepAlive` is deliberately omitted since Urahafu is a menu bar app the user may quit anytime,
-/// not a daemon that should be relaunched.
+/// not a daemon that should be relaunched. `ProgramArguments` includes `--login`
+/// (`src/app/args.rs` parses it back out) so the app can tell a login-triggered launch apart from
+/// an ordinary one (DESIGN.md "Settings window": no window on a login launch unless the tray icon
+/// is hidden too).
 #[must_use]
 pub fn launch_agent_plist(executable_path: &Path) -> String {
     let path_str = executable_path.to_string_lossy();
@@ -37,6 +40,7 @@ pub fn launch_agent_plist(executable_path: &Path) -> String {
     <key>ProgramArguments</key>
     <array>
         <string>{executable}</string>
+        <string>--login</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -111,6 +115,7 @@ mod tests {
         assert!(
             plist.contains("<string>/Applications/Urahafu.app/Contents/MacOS/urahafu</string>")
         );
+        assert!(plist.contains("<string>--login</string>"));
         assert!(plist.contains("<key>RunAtLoad</key>"));
         assert!(plist.contains("<true/>"));
     }

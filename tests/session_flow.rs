@@ -13,7 +13,7 @@ use urahafu::core::failsafe::FailsafeDelay;
 use urahafu::core::i18n::Language;
 use urahafu::core::layout::Point;
 use urahafu::core::session::{
-    EndReason, InputEvent, Session, SessionCommand, SessionConfig, SessionPhase,
+    EndReason, InputEvent, KeyKind, Session, SessionCommand, SessionConfig, SessionPhase,
 };
 
 /// A generous hit target so tests can drive the hold without fussing over exact geometry.
@@ -59,6 +59,16 @@ fn release(session: &mut Session, now: Instant) -> Vec<SessionCommand> {
         InputEvent::PointerUp {
             x: TARGET_CENTER.x,
             y: TARGET_CENTER.y,
+        },
+        now,
+    )
+}
+
+fn press_space(session: &mut Session, now: Instant) -> Vec<SessionCommand> {
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Space,
+            repeat: false,
         },
         now,
     )
@@ -110,7 +120,13 @@ fn cancel_during_countdown_never_blocks_inputs() {
     let start = Instant::now();
     let mut session = Session::new(config(false, FailsafeDelay::Seconds30), start);
 
-    let commands = session.handle_input(InputEvent::Escape, start + Duration::from_millis(500));
+    let commands = session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Escape,
+            repeat: false,
+        },
+        start + Duration::from_millis(500),
+    );
     assert_eq!(commands, vec![SessionCommand::Close]);
     assert_eq!(
         session.phase(),
@@ -148,7 +164,7 @@ fn dead_pixel_test_cycles_through_a_locked_session_without_unlocking() {
     let locked_at = lock(&mut session, start);
 
     for _ in 0..5 {
-        session.handle_input(InputEvent::Space, locked_at);
+        press_space(&mut session, locked_at);
     }
     // Five presses: Red, Green, Blue, White, Black.
     assert_eq!(
@@ -158,7 +174,7 @@ fn dead_pixel_test_cycles_through_a_locked_session_without_unlocking() {
     assert_eq!(session.phase(), SessionPhase::Locked);
 
     // A sixth press cycles back to the normal cleaning color.
-    session.handle_input(InputEvent::Space, locked_at);
+    press_space(&mut session, locked_at);
     assert_eq!(
         session.view(locked_at).background,
         CleaningColor::Black.rgb()
@@ -222,4 +238,46 @@ fn next_wake_schedule_never_lags_behind_a_pending_transition() {
         assert!(iterations < 10_000, "next_wake loop did not converge");
     }
     assert!(matches!(session.phase(), SessionPhase::Finished(_)));
+}
+
+/// End-to-end: holding Escape and Return together, and no other key, for the same 2 s duration as
+/// the button unlocks a session exactly like the button does (DESIGN.md §8) — never touching
+/// the pointer at all.
+#[test]
+fn escape_and_return_combo_unlocks_the_session_like_the_button() {
+    let start = Instant::now();
+    let mut session = Session::new(config(false, FailsafeDelay::Seconds60), start);
+    let locked_at = lock(&mut session, start);
+
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Escape,
+            repeat: false,
+        },
+        locked_at,
+    );
+    session.handle_input(
+        InputEvent::KeyDown {
+            kind: KeyKind::Return,
+            repeat: false,
+        },
+        locked_at,
+    );
+
+    let at_2s = locked_at + HOLD_DURATION;
+    assert!(
+        session.tick(at_2s).is_empty(),
+        "the completion scale pulse plays first"
+    );
+    assert_eq!(session.phase(), SessionPhase::Locked);
+
+    let after_pulse = at_2s + COMPLETION_SCALE_PULSE;
+    let commands = session.tick(after_pulse);
+    assert_eq!(commands, vec![SessionCommand::ReleaseInputs]);
+    assert_eq!(session.phase(), SessionPhase::Unlocking);
+
+    let end = after_pulse + UNLOCK_FADE;
+    let commands = session.tick(end);
+    assert_eq!(commands, vec![SessionCommand::Close]);
+    assert_eq!(session.phase(), SessionPhase::Finished(EndReason::Unlocked));
 }

@@ -41,21 +41,6 @@
         <target>Desbloqueio automático</target>
         <note>Menu submenu title grouping the fail-safe auto-unlock delay choices.</note>
       </trans-unit>
-      <trans-unit id="menu.auto_unlock.after_30s">
-        <source>After 30 s</source>
-        <target>Após 30 s</target>
-        <note>Menu submenu item: auto-unlock after 30 seconds.</note>
-      </trans-unit>
-      <trans-unit id="menu.auto_unlock.after_60s">
-        <source>After 60 s</source>
-        <target>Após 60 s</target>
-        <note>Menu submenu item: auto-unlock after 60 seconds.</note>
-      </trans-unit>
-      <trans-unit id="menu.auto_unlock.after_90s">
-        <source>After 90 s</source>
-        <target>Após 90 s</target>
-        <note>Menu submenu item: auto-unlock after 90 seconds.</note>
-      </trans-unit>
       <trans-unit id="menu.show_icon">
         <source>Show Icon in Menu Bar</source>
         <target>Mostrar ícone na barra de menus</target>
@@ -71,10 +56,10 @@
         <target>Sobre o Urahafu</target>
         <note>Menu item opening the About alert.</note>
       </trans-unit>
-      <trans-unit id="menu.source_code">
-        <source>Source Code on GitHub…</source>
-        <target>Código-fonte no GitHub…</target>
-        <note>Menu item opening the project's GitHub page in the browser.</note>
+      <trans-unit id="menu.settings">
+        <source>Settings…</source>
+        <target>Ajustes…</target>
+        <note>Tray menu item opening the settings window (Apple's standard term for this kind of item).</note>
       </trans-unit>
       <trans-unit id="menu.quit">
         <source>Quit Urahafu</source>
@@ -86,25 +71,15 @@
         <target>Permitir acesso de Acessibilidade…</target>
         <note>Menu item shown above 'Clean Screen'/'Clean Keyboard' (followed by a separator) only while Accessibility access is missing; opens System Settings on the Accessibility pane. Disappears once access is granted.</note>
       </trans-unit>
-      <trans-unit id="alert.hide_icon.title">
-        <source>Hide the Urahafu icon?</source>
-        <target>Ocultar o ícone do Urahafu?</target>
-        <note>Title of the confirmation alert shown before hiding the menu bar icon.</note>
+      <trans-unit id="menu.window">
+        <source>Window</source>
+        <target>Janela</target>
+        <note>Title of the app's second main-menu bar menu, holding only a 'Close' item. Apple's standard term for this menu; translate it the way macOS itself does in this language.</note>
       </trans-unit>
-      <trans-unit id="alert.hide_icon.text">
-        <source>Urahafu will start cleaning right away each time you open it. To get this menu back, hold Option while opening Urahafu.</source>
-        <target>O Urahafu vai começar a limpeza imediatamente sempre que você abri-lo. Para recuperar este menu, mantenha pressionada a tecla Option ao abrir o Urahafu.</target>
-        <note>Body of the hide-icon confirmation alert. Explains that Urahafu will clean immediately on launch, and how to get the menu back (hold Option while opening).</note>
-      </trans-unit>
-      <trans-unit id="alert.hide_icon.confirm">
-        <source>Hide Icon</source>
-        <target>Ocultar ícone</target>
-        <note>Default (destructive) button of the hide-icon confirmation alert.</note>
-      </trans-unit>
-      <trans-unit id="alert.hide_icon.cancel">
-        <source>Cancel</source>
-        <target>Cancelar</target>
-        <note>Cancel button of the hide-icon confirmation alert.</note>
+      <trans-unit id="menu.close">
+        <source>Close</source>
+        <target>Fechar</target>
+        <note>Item in the 'Window' main-menu bar menu (⌘W), closes the settings window. Apple's standard term for this item; translate it the way macOS itself does in this language.</note>
       </trans-unit>
       <trans-unit id="countdown.starting">
         <source>Cleaning is about to start</source>
@@ -122,14 +97,14 @@
         <note>The app's wordmark shown on the full-screen cleaning overlay. This is a proper noun (the app's name) and must stay 'urahafu', unchanged, in every language.</note>
       </trans-unit>
       <trans-unit id="overlay.hint.hold_to_unlock">
-        <source>Hold the close button for 2 seconds to unlock</source>
-        <target>Mantenha o botão de fechar pressionado por 2 segundos para desbloquear</target>
-        <note>Full-screen overlay hint explaining the hold-to-unlock gesture. Spells out 'close button' in words rather than using the ✕ glyph inline: next to a number ('✕ 2 seconds') the glyph would read as a multiplication sign. Never use ✕ or × in this string.</note>
+        <source>Hold the close button or Esc + Return for 2 seconds to unlock</source>
+        <target>Mantenha o botão de fechar ou Esc + Retorno pressionado por 2 segundos para desbloquear</target>
+        <note>Full-screen overlay hint explaining the hold-to-unlock gesture: either the close button, or holding Esc and Return together. Spells out 'close button' in words rather than using the ✕ glyph inline: next to a number ('✕ 2 seconds') the glyph would read as a multiplication sign. 'Esc' and 'Return' must be Apple's own localized names for those keys in this language (as printed in macOS's keyboard-shortcut notation and documentation, e.g. French 'Échap' and 'Retour'), joined with '+' exactly as here. Never use ✕ or × anywhere in this string.</note>
       </trans-unit>
       <trans-unit id="countdown.unlock_explanation">
-        <source>To unlock, hold the close button for 2 seconds</source>
-        <target>Para desbloquear, mantenha o botão de fechar pressionado por 2 segundos</target>
-        <note>Countdown screen's explanation of the hold-to-unlock gesture, shown while the countdown to locking is still running. Same wording constraint as overlay.hint.hold_to_unlock: spell out the button, never use ✕ or ×.</note>
+        <source>To unlock, hold the close button or Esc + Return for 2 seconds</source>
+        <target>Para desbloquear, mantenha o botão de fechar ou Esc + Retorno pressionado por 2 segundos</target>
+        <note>Countdown screen's explanation of the hold-to-unlock gesture, shown while the countdown to locking is still running: either the close button, or holding Esc and Return together. Same wording constraints as overlay.hint.hold_to_unlock: spell out the button, use Apple's own localized key names for Esc/Return joined with '+', never use ✕ or ×.</note>
       </trans-unit>
       <trans-unit id="hud.keyboard_locked">
         <source>Keyboard locked</source>
@@ -137,54 +112,34 @@
         <note>Keyboard-only mode HUD: compact pill shown while the keyboard is locked. Keep this very short, it renders in a small rounded pill.</note>
       </trans-unit>
       <trans-unit id="hud.hold_to_unlock">
-        <source>Hold the button 2 s</source>
-        <target>Mantenha o botão 2 s</target>
-        <note>Keyboard-only mode HUD: compact hold-to-unlock hint next to the ✕ button. Keep very short (HUD pill). Spell out 'button' in words, never use ✕ or × inline next to the number.</note>
-      </trans-unit>
-      <trans-unit id="welcome.title">
-        <source>Welcome to Urahafu</source>
-        <target>Bem-vindo ao Urahafu</target>
-        <note>Title of the welcome alert shown once on first launch in menu-bar mode, whatever the Accessibility permission state.</note>
-      </trans-unit>
-      <trans-unit id="welcome.text">
-        <source>Urahafu lets you clean your screen and keyboard without triggering anything. Its icon is in the menu bar, at the top right of the screen. While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock; otherwise the screen unlocks by itself after the delay you chose.</source>
-        <target>O Urahafu permite limpar a tela e o teclado sem acionar nada. O ícone fica na barra de menus, no canto superior direito da tela. Durante a limpeza, mantenha pressionado o botão de fechar na parte inferior da tela por 2 segundos para desbloquear; caso contrário, a tela se desbloqueia sozinha após o tempo escolhido.</target>
-        <note>Body of the welcome alert: explains where to find the menu bar icon (easy to miss) and the hold-to-unlock gesture, since the app only ever shows a small icon otherwise. Shown whatever the Accessibility permission state.</note>
-      </trans-unit>
-      <trans-unit id="welcome.continue">
-        <source>Continue</source>
-        <target>Continuar</target>
-        <note>Button of the welcome alert shown when Accessibility access is still missing; leads into the existing first-launch permission alert (first_launch.*) right after.</note>
-      </trans-unit>
-      <trans-unit id="first_launch.title">
-        <source>Urahafu needs Accessibility access</source>
-        <target>O Urahafu precisa de acesso de Acessibilidade</target>
-        <note>Title of the first-launch alert asking for Accessibility permission.</note>
-      </trans-unit>
-      <trans-unit id="first_launch.text">
-        <source>To block the keyboard and trackpad while you clean, allow Urahafu in System Settings › Privacy &amp; Security › Accessibility. Urahafu never records or sends what you type, and never connects to the internet.</source>
-        <target>Para bloquear o teclado e o trackpad durante a limpeza, autorize o Urahafu em Ajustes do Sistema › Privacidade e Segurança › Acessibilidade. O Urahafu nunca registra nem envia o que você digita, e não se conecta à Internet.</target>
-        <note>Body of the first-launch alert. Explains why Accessibility access is needed, the exact System Settings path, and reassures that Urahafu never records keystrokes or connects to the internet. Use the official macOS 13+ System Settings labels for this language (System Settings › Privacy &amp; Security → Accessibility).</note>
+        <source>Hold the button or Esc + Return 2 s</source>
+        <target>Mantenha o botão ou Esc + Retorno 2 s</target>
+        <note>Keyboard-only mode HUD: compact hold-to-unlock hint next to the ✕ button, mentioning the Esc+Return keyboard combo too. Keep very short (HUD pill). Spell out 'button' in words; 'Esc' and 'Return' must be Apple's own localized key names in this language, joined with '+' exactly as here; never use ✕ or × inline next to the number.</note>
       </trans-unit>
       <trans-unit id="first_launch.open_settings">
         <source>Open System Settings</source>
         <target>Abrir Ajustes do Sistema</target>
         <note>Default button of the first-launch alert, opens System Settings.</note>
       </trans-unit>
-      <trans-unit id="first_launch.later">
-        <source>Later</source>
-        <target>Mais tarde</target>
-        <note>Secondary button of the first-launch alert, dismisses without opening Settings.</note>
+      <trans-unit id="window.permission.text">
+        <source>Urahafu needs Accessibility access to block the keyboard and trackpad while you clean.</source>
+        <target>O Urahafu precisa de acesso de Acessibilidade para bloquear o teclado e o trackpad durante a limpeza.</target>
+        <note>Banner shown at the top of the settings window while Accessibility access is missing, next to a button reusing first_launch.open_settings. The Clean button is disabled while this banner is visible.</note>
       </trans-unit>
-      <trans-unit id="first_launch.ready.text">
-        <source>You're all set! While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock. Otherwise the screen unlocks by itself after the delay you chose.</source>
-        <target>Tudo pronto! Durante a limpeza, mantenha o botão de fechar pressionado na parte inferior da tela por 2 segundos para desbloquear. Caso contrário, a tela se libera sozinha após o tempo escolhido.</target>
-        <note>Body of the confirmation alert shown once Accessibility access has been granted, explaining the hold-to-unlock gesture and the fail-safe auto-unlock.</note>
+      <trans-unit id="window.open_at_login.needs_icon">
+        <source>Requires the menu bar icon.</source>
+        <target>Requer o ícone na barra de menus.</target>
+        <note>Small secondary note shown under the settings window's disabled 'Open at Login' checkbox, explaining why it's disabled (no menu bar icon to normally reach it from).</note>
       </trans-unit>
-      <trans-unit id="first_launch.ready.ok">
-        <source>OK</source>
-        <target>OK</target>
-        <note>OK button of the first-launch-ready confirmation alert.</note>
+      <trans-unit id="window.pixel_test_hint">
+        <source>During cleaning, press Space to test for dead pixels.</source>
+        <target>Durante a limpeza, pressione Espaço para testar pixels mortos.</target>
+        <note>Small secondary label in the settings window, shown under countdown.unlock_explanation, explaining the dead-pixel test (Space cycles the screen through red/green/blue/white/black during cleaning).</note>
+      </trans-unit>
+      <trans-unit id="window.seconds">
+        <source>{seconds} s</source>
+        <target>{seconds} s</target>
+        <note>Settings window: one segment label of the auto-unlock delay's segmented control. {seconds} is always one of 30/60/90, formatted with Western digits regardless of language. Keep very short (it's a segment label, not a sentence) — a unit abbreviation, not a full word, if this language has one.</note>
       </trans-unit>
       <trans-unit id="alert.permission_missing.title">
         <source>Accessibility access required</source>

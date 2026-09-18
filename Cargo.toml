@@ -15,8 +15,37 @@ core-foundation = "0.10.1"
 core-graphics = "0.25.0"
 core-text = "22.0.0"
 objc2 = "0.6.4"
-objc2-app-kit = { version = "0.3.2", features = ["NSView", "NSWindow"] }
-objc2-foundation = "0.3.2"
+objc2-app-kit = { version = "0.3.2", features = [
+    "NSButton",
+    "NSControl",
+    "NSFont",
+    "NSImage",
+    "NSImageView",
+    "NSMenuItem",
+    "NSPopUpButton",
+    "NSStackView",
+    "NSTextField",
+    "NSUserInterfaceLayout",
+    "NSView",
+    "NSWindow",
+] }
+# `objc2-core-services` is only needed for the settings window's Dock/Finder "reopen" Apple Event
+# handler (`src/platform/ffi/action_target.rs`): `NSAppleEventManager`'s selector-registration
+# method is only compiled by `objc2-foundation` when its own "objc2-core-services" feature is on,
+# and the event-class/event-id four-char-code constants (`kCoreEventClass`, `kAEReopenApplication`)
+# live in this crate, not in objc2-foundation itself.
+objc2-core-services = { version = "0.3.2", default-features = false, features = [
+    "AE",
+    "AEDataModel",
+    "AERegistry",
+    "AppleEvents",
+    "objc2",
+] }
+objc2-foundation = { version = "0.3.2", features = [
+    "NSAppleEventDescriptor",
+    "NSAppleEventManager",
+    "objc2-core-services",
+] }
 objc2-quartz-core = { version = "0.3.2", default-features = false, features = ["CALayer"] }
 softbuffer = "0.4"
 thiserror = "2"

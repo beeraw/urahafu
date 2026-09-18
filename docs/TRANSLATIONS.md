@@ -99,7 +99,7 @@ Every `translations/<tag>.xlf` file has the same structure. Annotated excerpt fr
 
 What matters in each `<trans-unit>`:
 
-- **`id`** — the string's key (`menu.clean_screen`, `alert.hide_icon.title`, …). At build time this
+- **`id`** — the string's key (`menu.clean_screen`, `alert.tap_failed.title`, …). At build time this
   becomes a variant of the Rust `Text` enum (`Text::MenuCleanScreen`, …): `en.xlf` defines the
   complete set of keys, and every other file must reuse the same `id`s.
 - **`<source>`** — the English text. In `en.xlf`, `<source>` and `<target>` are identical; in every
@@ -222,18 +222,23 @@ session.
 
 ## Recent keys
 
-Added with the welcome alert and Accessibility permission monitoring (DESIGN.md §10) and the
-countdown label that no longer depends on the digit (§7):
+Added with the settings window that replaced menu-bar/direct-launch mode (DESIGN.md's "Settings
+window" section): `menu.settings` (the tray and app menu item opening the window),
+`window.permission.text` (the window's permission banner), `window.open_at_login.needs_icon` (the
+note under a disabled "Open at Login" checkbox), `window.pixel_test_hint` (a small label explaining
+the dead-pixel test), and `menu.window`/`menu.close` (the app's Window menu and its Close item).
 
-- `welcome.title`, `welcome.text`, `welcome.continue` — first-launch welcome alert; its "OK" button
-  (shown when the permission is already granted) reuses `first_launch.ready.ok`.
-- `menu.grant_access` — the "Allow Accessibility Access…" menu item, only visible while the
-  permission is missing (§6).
-- `countdown.starting` — replaces `countdown.label` ("Cleaning in"): text that no longer depends on
-  the digit shown below it (§7). `countdown.label` has been removed from `en.xlf` and `fr.xlf`;
-  other languages still keep it, and the build will warn (`cargo:warning`) about a missing key
-  (`countdown.starting`) and a stale key (`countdown.label`) until each language's translators
-  update it — this is expected, not a regression.
+Reworded when the Esc + Return unlock combo was added: `overlay.hint.hold_to_unlock`,
+`countdown.unlock_explanation` and `hud.hold_to_unlock` now mention the key combo.
+
+The settings window replaced several alerts outright: `welcome.*`, `first_launch.title`,
+`first_launch.text`, `first_launch.later`, `first_launch.ready.*` and `alert.hide_icon.*` have been
+removed from every `translations/*.xlf` file (`first_launch.open_settings` survives — reused by the
+window's permission banner button).
+
+Earlier: `menu.grant_access` — the "Allow Accessibility Access…" menu item, only visible while the
+permission is missing (§6). `countdown.starting` — replaces `countdown.label` ("Cleaning in"): text
+that no longer depends on the digit shown below it (§7).
 
 ## Translation notes
 
@@ -257,5 +262,12 @@ countdown label that no longer depends on the digit (§7):
 - **Register**: informal and consistent with the original English — formality of address, how
   imperatives are phrased, etc. is up to the translator's judgment for their language, as long as
   the tone stays consistent from one string to the next within the same file.
+- **Esc and Return key names** follow the name Apple prints for these keys in that language's
+  macOS keyboard-shortcuts documentation. Most languages keep "Esc" and "Return" in Latin script;
+  known exceptions are French (Échap + Retour), German (Esc + Eingabetaste), Italian (Esc + Invio),
+  Spanish and Portuguese (Esc + Retorno), Danish (Retur), Swedish (Retur), Hungarian and Norwegian
+  (Enter), Arabic (رجوع), Thai (รีเทิร์น), and Hong Kong Chinese (返回, where Taiwan keeps
+  "Return"). Key names worth a native check first: Latin American Spanish, Catalan, Romanian,
+  Finnish (shortened in the HUD), Malay, and every language macOS itself isn't localized into.
 - The keyboard-only mode HUD (`hud.*`) is a compact pill: favor short translations that won't
   overflow, as the `<note>`s on these keys in `en.xlf` point out.

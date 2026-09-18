@@ -20,12 +20,6 @@ pub enum Error {
     #[cfg(target_os = "macos")]
     #[error("system error: {0}")]
     System(#[from] crate::platform::system::SystemError),
-    /// Building the menu bar tray icon/menu failed at startup, in menu-bar mode. There is no
-    /// sensible way to run menu-bar mode without it, so this is fatal rather than logged and
-    /// skipped (unlike most other platform errors, which are handled locally in `src/app/`).
-    #[cfg(target_os = "macos")]
-    #[error("tray error: {0}")]
-    Tray(#[from] crate::platform::tray::TrayError),
     /// Building the winit event loop, or running it, failed.
     #[cfg(target_os = "macos")]
     #[error("event loop error: {0}")]

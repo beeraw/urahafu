@@ -59,8 +59,45 @@ jobs:
           cargo bundle --release
           cp target/universal/urahafu "target/release/bundle/osx/Urahafu.app/Contents/MacOS/urahafu"
 
-      - name: Ad-hoc codesign
-        run: codesign --force --deep -s - "target/release/bundle/osx/Urahafu.app"
+      # The project certificate keeps the Accessibility permission across updates (see
+      # packaging/sign.sh and SECURITY.md "Code signing"). It lives only in a throwaway keychain
+      # for the duration of this job.
+      - name: Import the signing certificate
+        env:
+          CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+        run: |
+          if [ -z "$CERT_P12_BASE64" ] || [ -z "$CERT_PASSWORD" ]; then
+            echo "::error::the MACOS_CERT_P12 and MACOS_CERT_PASSWORD secrets are required"
+            exit 1
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 24)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 900 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          printf '%s' "$CERT_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/signing.p12"
+          security import "$RUNNER_TEMP/signing.p12" -k "$KEYCHAIN" -P "$CERT_PASSWORD" \
+            -T /usr/bin/codesign
+          rm -f "$RUNNER_TEMP/signing.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" \
+            $(security list-keychains -d user | tr -d '"')
+          echo "SIGNING_KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+
+      - name: Codesign
+        run: |
+          packaging/sign.sh "target/release/bundle/osx/Urahafu.app"
+          codesign --display --requirements - "target/release/bundle/osx/Urahafu.app" 2>&1 \
+            | grep -q 'certificate leaf = H"11700e5903a230d75a389ffd99928a689f5fa11a"'
+
+      - name: Remove the signing keychain
+        if: always()
+        run: |
+          if [ -n "${SIGNING_KEYCHAIN:-}" ]; then
+            security delete-keychain "$SIGNING_KEYCHAIN"
+          fi
 
       - name: Zip the app
         working-directory: target/release/bundle/osx

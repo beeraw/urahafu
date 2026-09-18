@@ -11,8 +11,8 @@ use std::time::{Duration, Instant};
 
 use crate::core::easing::ease_in_out_cubic;
 
-/// Duration the hint stays fully visible right after the session starts (hold-to-unlock spec:
-/// 6 s, up from the typed-sequence design's 4 s).
+/// Duration the hint stays fully visible right after the session starts (DESIGN.md §8: 6 s, up
+/// from the typed-sequence design's 4 s).
 const INITIAL_HOLD: Duration = Duration::from_secs(6);
 /// Fade-out duration after the initial hold.
 const INITIAL_FADE_OUT: Duration = Duration::from_millis(1200);

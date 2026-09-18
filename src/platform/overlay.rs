@@ -50,9 +50,9 @@
 //! What was verified, and how: the `objc2-app-kit`/`objc2-quartz-core` method signatures used
 //! (`setWantsLayer`, `NSView::layer`, `CALayer::setCornerRadius`/`setMasksToBounds`,
 //! `NSWindow::setHasShadow`/`invalidateShadow`) and `softbuffer`'s sublayer-not-replace behavior
-//! were both confirmed by reading the crates' source in this sandboxed environment (no logged-in
-//! GUI session available here to visually confirm the rounded pill on real hardware) — see the
-//! final report for what that leaves unverified.
+//! were both confirmed by reading the crates' source in this sandboxed environment. No logged-in
+//! GUI session is available here to visually confirm the rounded pill on real hardware, so that
+//! remains unverified until it is checked on a real display.
 
 use std::num::NonZeroU32;
 use std::rc::Rc;
@@ -66,7 +66,7 @@ use winit::window::{Window, WindowId, WindowLevel};
 
 use crate::core::i18n::Language;
 use crate::core::layout::{self, Layout, ScreenSize};
-use crate::core::session::{InputEvent, SessionView};
+use crate::core::session::{InputEvent, KeyKind, SessionView};
 use crate::platform::render::{self, Appearance, Rasterize, ScreenRole};
 
 /// Which kind of window(s) an [`Overlay`] manages (DESIGN.md §8 vs §9).
@@ -306,7 +306,10 @@ impl Overlay {
         match event {
             WindowEvent::KeyboardInput { event, .. } if event.state == ElementState::Pressed => {
                 match &event.logical_key {
-                    Key::Named(NamedKey::Escape) => Some(InputEvent::Escape),
+                    Key::Named(NamedKey::Escape) => Some(InputEvent::KeyDown {
+                        kind: KeyKind::Escape,
+                        repeat: event.repeat,
+                    }),
                     _ => None,
                 }
             }

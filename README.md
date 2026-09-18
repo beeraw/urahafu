@@ -12,12 +12,13 @@ pressing and holding the ✕ button for 2 seconds.
 
 ## Features
 
-- **Unlock by holding the ✕ button for 2 seconds** — a progress ring fills
-  around the button as you hold it; releasing early or moving off it cancels
-  and drains the ring. Works with any keyboard layout, since it doesn't
-  involve typing at all — key events aren't even read for their character
-  anymore, only used to know that *some* key was pressed (see
-  [Privacy & security](#privacy--security)).
+- **Unlock by holding the ✕ button for 2 seconds — or by holding Esc and
+  Return together** — a progress ring fills around the button as you hold
+  either one; releasing early, moving off the button, or pressing any other
+  key cancels and drains the ring. Works with any keyboard layout, since it
+  doesn't involve typing at all — key events aren't even read for their
+  character, only their physical key code, and only to recognize Esc, Return
+  and Space (see [Privacy & security](#privacy--security)).
 - **3-second countdown** before blocking starts, cancellable with Esc or a
   click.
 - **Fail-safe auto-unlock** after 30, 60 or 90 seconds (default 60s), so you
@@ -27,9 +28,9 @@ pressing and holding the ✕ button for 2 seconds.
 - **Dead-pixel test**: press Space during a session to cycle red → green →
   blue → white → black, to spot dead or stuck pixels while you're at it.
 - **Black or white cleaning screen**, whichever shows dust or smudges best.
-- **Menu bar mode or direct-launch mode**: keep the usual menu bar icon and
-  menu, or hide the icon so opening the app cleans immediately — hold
-  <kbd>Option</kbd> at launch to get the menu back for that one launch.
+- **Settings window**: opening the app shows a native settings window with
+  every option and a Clean button, plus an optional menu bar icon for
+  quick access without reopening the window.
 - **Open at login**, as a standard macOS login item.
 - **47 languages** (see the full list in
   [`docs/TRANSLATIONS.md`](docs/TRANSLATIONS.md#languages)), following the system language
@@ -57,17 +58,16 @@ zip from GitHub Releases.
    ```
 3. Unzip it and move `Urahafu.app` to `/Applications`.
 
-### Gatekeeper: opening an unsigned app
+### Gatekeeper: opening the app the first time
 
-Urahafu is signed ad-hoc (see [Privacy & security](#privacy--security)), not
-with a paid Apple Developer certificate, so Gatekeeper will refuse to open it
-with a plain double-click the first time. This is expected for an
-open-source project without an Apple Developer account, not a sign that
-something's wrong. Pick one:
+Urahafu is signed with the project's own code signing certificate, not with a
+paid Apple Developer ID, and it isn't notarized. Gatekeeper will therefore
+refuse to open it with a plain double-click the first time. This is expected
+for an open-source project without an Apple Developer account, not a sign
+that something's wrong. Pick one:
 
 - **Right-click (or Control-click) `Urahafu.app` → Open**, then confirm in the
-  dialog that appears. This is the standard, safest way to open an
-  ad-hoc-signed app once.
+  dialog that appears. This is the standard, safest way to open it once.
 - Or go to **System Settings › Privacy & Security**, scroll down, and click
   **"Open Anyway"** next to the message about Urahafu.
 - Or, from Terminal, clear the quarantine attribute macOS attaches to files
@@ -77,9 +77,29 @@ something's wrong. Pick one:
   ```
   Being fully honest about what this does: it removes the flag that makes
   Gatekeeper prompt in the first place, for this app only. It doesn't verify
-  anything about the binary beyond what your own review or the checksum
-  above already gives you — use it if you're comfortable with that, not as a
-  way to skip understanding the previous two options.
+  anything about the binary beyond what your own review, the checksum or the
+  signature check below already gives you.
+
+### Verifying the signature
+
+Every release is signed with the same certificate, "Urahafu Code Signing".
+Its fingerprints are:
+
+- SHA-256: `C8F45C09786BF978F6056F721816BEC9EC4E8445A4BA982BB6B5C1C578D83C5C`
+- SHA-1: `11700E5903A230D75A389FFD99928A689F5FA11A`
+
+To check that an app really comes from this project:
+
+```sh
+codesign --display --requirements - /Applications/Urahafu.app
+```
+
+The output must end with
+`certificate leaf = H"11700e5903a230d75a389ffd99928a689f5fa11a"`.
+
+Signing every release with the same certificate is also what keeps the
+Accessibility permission across updates: macOS ties the permission to the
+app's identifier and certificate, so an update doesn't ask for it again.
 
 ### Granting Accessibility permission
 
@@ -87,11 +107,12 @@ Urahafu asks for Accessibility access on first launch. It needs this because
 blocking keyboard and trackpad input while you clean requires a macOS
 accessibility event tap (`CGEventTap`) — there's no other public API for it.
 Nothing you type is recorded, logged, or sent anywhere: see
-[Privacy & security](#privacy--security) below, and the alert itself says so
-before you grant anything.
+[Privacy & security](#privacy--security) below.
 
-Grant it in **System Settings › Privacy & Security › Accessibility**, or by
-clicking "Open System Settings" in Urahafu's own prompt.
+Click **Open System Settings** in the banner at the top of Urahafu's window:
+macOS lists Urahafu under **System Settings › Privacy & Security ›
+Accessibility**, and you only have to switch it on. The banner disappears by
+itself a couple of seconds later.
 
 ## How it works
 
@@ -114,11 +135,13 @@ tears down the event tap when the owning process dies.
 - **No network access at all.** Urahafu doesn't make any network requests,
   ever.
 - **No keystroke logging, and no keystroke reading either.** Unlocking works
-  by holding an on-screen ✕ button, not by typing, so the app doesn't need to
-  know which key was pressed at all — key events forwarded internally no
-  longer carry the character, only the fact that a key (or Space, or Escape)
-  was blocked. This is stronger than just not storing what you type: there's
-  nothing left to store.
+  by holding an on-screen ✕ button — or by holding Esc and Return together —
+  not by typing, so the app doesn't need to know *what* was typed at all: it
+  only reads the physical key codes of Escape, Return and Space, just enough
+  to recognize those three keys and tell that some other key was pressed;
+  no character is ever decoded, and nothing is stored or sent anywhere. This
+  is stronger than just not storing what you type: there's nothing left to
+  store.
 - **Settings** are stored locally in
   `~/Library/Application Support/Urahafu/settings.conf` (cleaning color,
   fail-safe delay, keyboard-only mode, menu bar icon visibility).
@@ -137,9 +160,13 @@ CI for the minimum supported version) and Xcode command line tools.
 cargo build --release
 cargo install --locked cargo-bundle   # once
 cargo bundle --release
+packaging/sign.sh target/release/bundle/osx/Urahafu.app
 ```
 
 `cargo bundle` produces `target/release/bundle/osx/Urahafu.app`.
+`packaging/sign.sh` signs it with the project certificate when it's in your
+keychain (maintainers), and ad-hoc otherwise: an ad-hoc build works the same,
+but macOS asks for the Accessibility permission again after every rebuild.
 
 ## Development
 

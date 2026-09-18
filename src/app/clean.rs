@@ -1,6 +1,8 @@
-//! The "Clean" flow (DESIGN.md §7-§9, §11): preflight checks, opening the
-//! [`crate::core::session::Session`]/[`Overlay`], and driving
-//! [`crate::core::session::SessionCommand`]s as the session advances.
+//! The "Clean" flow (DESIGN.md §7-§9, §11, "Settings window"): preflight checks,
+//! opening the [`crate::core::session::Session`]/[`Overlay`], and driving
+//! [`crate::core::session::SessionCommand`]s as the session advances. Never `exit`s after a
+//! session anymore: control always returns to the window (if that's where it was started from)
+//! or the tray/idle state.
 
 use std::sync::mpsc;
 use std::thread;
@@ -8,7 +10,7 @@ use std::time::Instant;
 
 use winit::event_loop::{ActiveEventLoop, ControlFlow};
 
-use super::{App, CleaningSession, LaunchMode, RunState, UserEvent, main_thread_marker};
+use super::{App, CleanOrigin, CleaningSession, RunState, UserEvent, main_thread_marker};
 use crate::core::layout::{self, Layout};
 use crate::core::session::{Session, SessionCommand, SessionConfig};
 use crate::platform::alert::{self, AlertSpec};
@@ -34,17 +36,30 @@ fn preflight() -> Result<(), BlockError> {
 }
 
 impl App {
-    /// Starts a cleaning attempt: preflight, then (on success) opens the session/overlay. Called
-    /// both for the tray's "Clean" command and to retry after a "Try Again" alert.
-    pub(super) fn try_start_clean(&mut self, event_loop: &ActiveEventLoop) {
-        if let Err(err) = preflight() {
-            self.handle_block_error(event_loop, err);
-            return;
-        }
-        self.open_session_and_overlay(event_loop);
+    /// Starts a cleaning attempt from the tray's "Clean" command.
+    pub(super) fn start_clean_from_tray(&mut self, event_loop: &ActiveEventLoop) {
+        self.try_start_clean(event_loop, CleanOrigin::Tray);
     }
 
-    fn open_session_and_overlay(&mut self, event_loop: &ActiveEventLoop) {
+    /// Starts a cleaning attempt from the settings window's "Clean" button: hides the window
+    /// first (DESIGN.md "Settings window"), then runs the usual flow.
+    pub(super) fn start_clean_from_window(&mut self, event_loop: &ActiveEventLoop) {
+        self.hide_window();
+        self.try_start_clean(event_loop, CleanOrigin::Window);
+    }
+
+    /// Starts a cleaning attempt: preflight, then (on success) opens the session/overlay. Called
+    /// both for a fresh "Clean" command and to retry after a "Try Again" alert (which always
+    /// retries with the same origin the failed attempt had).
+    fn try_start_clean(&mut self, event_loop: &ActiveEventLoop, origin: CleanOrigin) {
+        if let Err(err) = preflight() {
+            self.handle_block_error(event_loop, err, origin);
+            return;
+        }
+        self.open_session_and_overlay(event_loop, origin);
+    }
+
+    fn open_session_and_overlay(&mut self, event_loop: &ActiveEventLoop, origin: CleanOrigin) {
         let now = Instant::now();
         let config = SessionConfig {
             color: self.settings.color,
@@ -66,13 +81,14 @@ impl App {
                     overlay,
                     blocker: None,
                     rasterizer: TextRasterizer::new(),
+                    origin,
                 }));
                 self.update_unlock_target(now);
                 self.tick_cleaning(event_loop);
             }
             Err(err) => {
                 eprintln!("urahafu: failed to open the cleaning overlay: {err}");
-                self.finish_clean_attempt(event_loop);
+                self.finish_clean_attempt(origin);
             }
         }
     }
@@ -146,7 +162,7 @@ impl App {
             match command {
                 SessionCommand::BlockInputs => self.handle_block_inputs(event_loop),
                 SessionCommand::ReleaseInputs => self.handle_release_inputs(),
-                SessionCommand::Close => self.handle_close(event_loop),
+                SessionCommand::Close => self.handle_close(),
             }
         }
     }
@@ -183,9 +199,10 @@ impl App {
         match InputBlocker::start(deadline, tx) {
             Ok(guard) => cleaning.blocker = Some(guard),
             Err(err) => {
+                let origin = cleaning.origin;
                 cleaning.overlay.close();
                 self.state = RunState::Idle;
-                self.handle_block_error(event_loop, err);
+                self.handle_block_error(event_loop, err, origin);
             }
         }
     }
@@ -200,21 +217,28 @@ impl App {
     }
 
     /// The session is fully done (unlocked, fail-safe fired, or cancelled during the countdown):
-    /// close the overlay and go back to idle; in direct mode, exit the app entirely.
-    fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
-        if let RunState::Cleaning(cleaning) = &mut self.state {
-            cleaning.blocker = None;
-            cleaning.overlay.close();
-        }
+    /// close the overlay and return to where it was started from (DESIGN.md "Settings window")
+    /// — the window shows again if the session was started from it, otherwise back to idle as
+    /// before. Never exits the app anymore.
+    fn handle_close(&mut self) {
+        let RunState::Cleaning(cleaning) = &mut self.state else {
+            return;
+        };
+        let origin = cleaning.origin;
+        cleaning.blocker = None;
+        cleaning.overlay.close();
         self.state = RunState::Idle;
-        if self.mode == LaunchMode::Direct {
-            event_loop.exit();
-        }
+        self.return_from_clean(origin);
     }
 
     /// Shows the alert matching `err` (DESIGN.md §11) and either retries the whole clean attempt
-    /// ("Try Again", for the two retryable failures) or ends it.
-    fn handle_block_error(&mut self, event_loop: &ActiveEventLoop, err: BlockError) {
+    /// ("Try Again", for the two retryable failures, with the same `origin`) or ends it.
+    fn handle_block_error(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        err: BlockError,
+        origin: CleanOrigin,
+    ) {
         let mtm = main_thread_marker();
         match err {
             BlockError::PermissionDenied => {
@@ -224,34 +248,39 @@ impl App {
                         eprintln!("urahafu: failed to open System Settings: {open_err}");
                     }
                 }
-                self.finish_clean_attempt(event_loop);
+                self.finish_clean_attempt(origin);
             }
             BlockError::SecureInputActive => {
                 let choice = alert::show(&AlertSpec::secure_input(self.language), mtm);
                 if choice == 0 {
-                    self.try_start_clean(event_loop);
+                    self.try_start_clean(event_loop, origin);
                 } else {
-                    self.finish_clean_attempt(event_loop);
+                    self.finish_clean_attempt(origin);
                 }
             }
             BlockError::TapCreationFailed => {
                 let choice = alert::show(&AlertSpec::tap_failed(self.language), mtm);
                 if choice == 0 {
-                    self.try_start_clean(event_loop);
+                    self.try_start_clean(event_loop, origin);
                 } else {
-                    self.finish_clean_attempt(event_loop);
+                    self.finish_clean_attempt(origin);
                 }
             }
         }
     }
 
     /// Ends a failed clean attempt (no overlay was ever shown, or it was already closed by the
-    /// caller): back to idle in menu-bar mode, or exit in direct mode (DESIGN.md §11: "In
-    /// direct-launch mode, once the error alert is dismissed, the app quits").
-    fn finish_clean_attempt(&mut self, event_loop: &ActiveEventLoop) {
+    /// caller): return to where it was started from, exactly like a normal session end.
+    fn finish_clean_attempt(&mut self, origin: CleanOrigin) {
         self.state = RunState::Idle;
-        if self.mode == LaunchMode::Direct {
-            event_loop.exit();
+        self.return_from_clean(origin);
+    }
+
+    /// Common tail of both a finished session and a failed attempt: show the window again if it
+    /// was started from there, otherwise leave the app at idle in the menu bar as before.
+    fn return_from_clean(&mut self, origin: CleanOrigin) {
+        if origin == CleanOrigin::Window {
+            self.present_window(main_thread_marker());
         }
     }
 }

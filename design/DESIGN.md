@@ -149,50 +149,183 @@ Main sizes (relative to a reference 1440×900 pt screen):
 | Pixel-test step indicator ("2/5") | 11 pt | Regular |
 | "Esc or click to cancel" hint | 13 pt | Regular |
 
-## 6. Menu (menu bar mode)
+## 6. Menu (tray)
+
+Reduced to the actions that make sense from the menu bar alone; everything else (color,
+auto-unlock, keyboard-only, show/hide icon, open at login, about) lives in the settings window
+below.
 
 | # | English | Key | Type |
 |---|---|---|---|
 | 0 | Allow Accessibility Access… *(only while the permission is missing)* | `menu.grant_access` | Action |
 | — | ──────── *(only with item 0)* | — | Separator |
 | 1 | Clean Screen *(or* Clean Keyboard *in keyboard-only mode)* | `menu.clean_screen` / `menu.clean_keyboard` | Action |
-| 2 | Keyboard Only Mode | `menu.keyboard_only_mode` | Checkbox |
 | — | ──────── | — | Separator |
-| 3 | Color ▸ | `menu.color` | Submenu (`menu.color.black` ✓ / `menu.color.white`) |
-| 4 | Auto-Unlock ▸ | `menu.auto_unlock` | Submenu (`menu.auto_unlock.after_30s` / `after_60s` ✓ / `after_90s`) |
+| 2 | Settings… | `menu.settings` | Action (opens the settings window) |
 | — | ──────── | — | Separator |
-| 5 | Show Icon in Menu Bar | `menu.show_icon` | Checkbox |
-| 6 | Open at Login | `menu.open_at_login` | Checkbox |
-| — | ──────── | — | Separator |
-| 7 | About Urahafu | `menu.about` | Action |
-| 8 | Source Code on GitHub… | `menu.source_code` | Action |
-| — | ──────── | — | Separator |
-| 9 | Quit Urahafu | `menu.quit` | Action |
+| 3 | Quit Urahafu | `menu.quit` | Action |
 
 Rules:
 - The menu's language follows the system language, no manual setting. 47 languages are available;
   the table above shows the English reference text and translation key only — see
   `docs/TRANSLATIONS.md` for the full language list and the detection rule.
-- Checkmarks on checkboxes and on the selected item of submenus (Color, Auto-Unlock). No keyboard
-  shortcuts are shown, consistent with the project's "no global shortcuts" principle.
+- No keyboard shortcuts are shown, consistent with the project's "no global shortcuts" principle.
 - Item 1 has a dynamic label: "Clean Screen" becomes "Clean Keyboard" when keyboard-only mode is
   active, to reflect the action that's actually triggered.
 - Item 0 ("Allow Accessibility Access…") only appears, with its separator, while Accessibility
   permission is missing; it opens System Settings to the Accessibility pane
   (`permission::open_accessibility_settings`) and disappears as soon as the permission is granted —
-  the menu updates itself (see §10, "permission monitoring").
-- "Open at Login" is grayed out (disabled) when the menu bar icon is hidden (direct-launch mode,
-  menu reached by holding Option): this setting no longer makes sense once there's no icon to
-  normally reach it from.
-- Unchecking "Show Icon in Menu Bar" triggers a confirmation alert before acting, since it's an
-  action that fundamentally changes how the app launches:
+  the menu updates itself (see the "Settings window" section, "permission monitoring").
 
-  | | English | Key |
-  |---|---|---|
-  | Title | Hide the Urahafu icon? | `alert.hide_icon.title` |
-  | Text | Urahafu will start cleaning right away each time you open it. To get this menu back, hold Option while opening Urahafu. | `alert.hide_icon.text` |
-  | Default button | Hide Icon | `alert.hide_icon.confirm` |
-  | Cancel button | Cancel | `alert.hide_icon.cancel` |
+## Settings window
+
+Opening the app (Dock, Finder, Spotlight, `open`) shows a native settings window instead of the
+old "direct-launch mode": no more hidden mode that starts cleaning immediately, no more holding
+Option to get the menu back. The window replaces the removed welcome alert, first-launch alert and
+hide-icon confirmation as the single place that explains and controls the app.
+
+### Layout
+
+Native AppKit via `objc2-app-kit`, System Settings-style: rounded group boxes, switches, a
+segmented control, and a flat accent-colored Clean button. No custom drawing beyond a handful of
+plain `NSBox` fills/borders — no icons, no SF Symbols, no `CALayer`s (own artwork only; the two
+places that need an arbitrary flat color and a click target at once — the color swatches, the
+Clean button — overlay a borderless `NSButton` on top of an `NSBox`, since neither control can do
+both alone). Titled + closable + miniaturizable, not resizable, title "Urahafu", centered on first
+show, `releasedWhenClosed = false` (the window is built once and reused). Content width 400 pt, 24
+pt margins on every side (total window width 448 pt, fixed), 18 pt between sections, group-box rows
+at least 44 pt tall with 16 pt side padding. The generous spacing is deliberate: long translations
+(Finnish, French, Tamil) must not look cramped. Height always fits content: a single
+vertical `NSStackView` pinned to the content view's edges, leading-aligned (so RTL mirrors
+automatically — the content view's `userInterfaceLayoutDirection` is set to right-to-left for RTL
+languages). Every full-width element (group boxes, banner, Clean button) is pinned to exactly
+400 pt via an explicit `NSLayoutConstraint`. A group-box row's label gets whatever width its
+control leaves free and wraps onto a second line when needed (the row grows with it), so a long
+label never runs under its control. The group boxes and the banner are plain container views with
+an `NSBox` as their background and the row stack pinned on top: an `NSBox` never sizes itself from
+its own content view, so using it as the container collapses the box to zero height. Checked on
+screen in light and dark mode and in German, French, Finnish and Tamil. After building, and after
+every `update()` call that can change what's visible (permission banner, "Open at Login" note), the
+window is resized to the content's fitting size, keeping its top-left corner fixed.
+
+```
+[app icon 52pt]  Urahafu                        (system 15pt semibold)
+                 <about.tagline>                (system 12pt, secondaryLabelColor, wraps)
+
+┌ banner (only while permission missing, systemOrange @ ~15% alpha, corner 10) ─────────────┐
+│ <window.permission.text>  (12pt, wraps)                                                   │
+│                                          [ Open System Settings ]  (first_launch.open_settings) │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌ group box (corner 10, dynamic subtle fill) ────────────────────────────────────────────────┐
+│ Color                                          ⚫︎ ⚪︎        two 26×26pt swatches (menu.color.black/
+│                                                             white); selected one gets a 2pt teal
+│                                                             ring, 2pt gap                        │
+│ ─────────────────────────────────────────────────────────────────────────────────────────  │
+│ Auto-Unlock                          [ 30 s | 60 s | 90 s ]  NSSegmentedControl, window.seconds  │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌ group box (same style) ────────────────────────────────────────────────────────────────────┐
+│ Keyboard-Only Mode                                                                  ⚪︎──  │ NSSwitch
+│ ─────────────────────────────────────────────────────────────────────────────────────────  │
+│ Show Icon in Menu Bar                                                               ⚪︎──  │
+│ ─────────────────────────────────────────────────────────────────────────────────────────  │
+│ Open at Login                                                                       ⚪︎──  │
+│   <window.open_at_login.needs_icon>  (11pt, tertiaryLabelColor, only when disabled)         │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+
+<countdown.unlock_explanation>  (11pt, secondaryLabelColor, wraps)
+<window.pixel_test_hint>        (11pt, secondaryLabelColor, wraps, 6pt below the line above)
+
+┌──────────────────────────── Clean Screen ────────────────────────────┐  flat accent teal
+└─────────────────────────────────────────────────────────────────────┘  (#22B8C8) fill, corner 10,
+                                                                          white 14pt semibold, Return
+                                                                          key; label = clean_keyboard
+                                                                          in keyboard-only mode;
+                                                                          ~40% opacity + disabled
+                                                                          while permission is missing
+```
+
+Labels reuse existing `Text` keys (`menu.color`, `menu.auto_unlock`, …) plus one new one,
+`window.seconds` (`"{seconds} s"`, the segmented control's per-segment label — 30/60/90 in Western
+digits regardless of language). `menu.auto_unlock.after_30s/60s/90s` are gone: the segmented
+control's labels are built from `window.seconds` instead of three separate full-sentence keys. App
+icon: `NSApplication.applicationIconImage` (nil-safe: the image view is skipped if absent, and the
+tagline's wrap width then uses the window's full content width instead of leaving room for it).
+There is no "About Urahafu" button in the window any more — About stays reachable only from the app
+menu (`menu.about`, unchanged there). Every change applies immediately and is saved (same
+`persist_settings` path as before). The window stays in sync when settings change from the tray
+(Clean label) or permission changes.
+
+### Behavior
+
+1. **Normal launch** (Dock, Finder, Spotlight, `open`): shows the settings window, and the tray
+   icon too iff `show_menu_bar_icon`. Activation policy `Regular` while the window is visible (Dock
+   icon + Cmd-Tab), back to `Accessory` when it is hidden. The bundle has no `LSUIElement`: the app
+   launches as a regular app, so macOS brings it to the front like any app it launches (an
+   `LSUIElement` app isn't activated at launch, and since macOS 14 an app can't force itself to the
+   front afterwards). Only a `--login` launch with the icon shown switches to `Accessory` at once.
+2. **Launch with `--login`** (from the LaunchAgent): no window; tray icon only if
+   `show_menu_bar_icon`; if the icon is hidden, the window shows anyway — the app never runs
+   invisibly. `core::login_item::launch_agent_plist` adds `--login` to `ProgramArguments`.
+3. **Reopen while running** (the user opens the app again from Dock/Spotlight/Finder): shows and
+   activates the window, via the `kAEReopenApplication` Apple Event (winit exposes no reopen hook).
+   Ignored while a cleaning session runs.
+4. **Closing the window** (red button, Cmd-W, Esc): if the tray icon is shown, hides the window
+   (the app keeps running in the menu bar, policy → `Accessory`); if not, quits the app. Cmd-Q
+   quits regardless.
+5. **Clean button**: hides the window, runs the usual session (preflight, countdown, overlay,
+   blocker — unchanged). When the session ends (unlock, fail-safe, countdown cancelled, or an
+   error alert dismissed), the window shows again if the session was started from it; if it was
+   started from the tray, the app just goes back to idle, as before. The app never exits after a
+   session anymore — direct-launch mode's "quit on error/end" behavior is gone along with it.
+6. **Show Icon in Menu Bar switch**: applies live — creates or drops the tray immediately. No
+   confirmation alert, no quit (the old hide-icon confirmation alert is gone). Turning it off also
+   disables the login item.
+7. **Open at Login switch**: disabled while the icon is hidden, with the small secondary note
+   `window.open_at_login.needs_icon` underneath its label.
+8. **Permission**: while Accessibility is missing, the window shows the banner above
+   (`window.permission.text` + a button reusing `first_launch.open_settings`) and the Clean button
+   is disabled. The permission watcher (2 s poll) runs whenever idle and access is missing, in
+   every launch shape; when access flips to granted, the window and tray refresh (banner
+   disappears, Clean enabled) — no "ready" alert anymore.
+
+### Removed
+
+`LaunchMode`/direct-launch mode, holding Option to reopen the menu, the welcome alert, the
+first-launch permission alert's chaining logic, the "ready" confirmation alert, and the hide-icon
+confirmation alert. The three Safety-net error alerts (§11) and the About alert (§12) are
+unchanged. `Settings::welcome_seen` is no longer written (the loader still silently ignores it in
+old settings files, so nothing breaks for existing installs).
+
+## App main menu
+
+Showing the settings window makes the app `Regular` (Dock icon + Cmd-Tab), which needs a real menu
+bar — a bare Dock icon with no menu at all is not a normal-looking Mac app. Built once at startup
+(`objc2-app-kit`'s `NSMenu`/`NSMenuItem`, safe code only outside `src/platform/ffi/`) and installed
+as `NSApplication.mainMenu`; it is not itself shown or hidden separately from the settings window
+— it is simply always there once the app has launched, the same way every other Mac app's menu bar
+is, and it plays no role during a cleaning session (the overlay swallows input at the tap level
+regardless of what the menu bar underneath it contains).
+
+Two menus, kept deliberately minimal — this is a small utility, not an app with File/Edit content:
+
+| # | English | Key equivalent | Action |
+|---|---|---|---|
+| — | *(App menu; its displayed title is replaced by the running process name by `AppKit` itself)* | | |
+| 1 | About Urahafu | — | `menu.about`, reuses the existing About alert (§12) |
+| — | ──────── | | Separator |
+| 2 | Settings… | ⌘, | `menu.settings`, shows the settings window (like the tray's own item) |
+| — | ──────── | | Separator |
+| 3 | Quit Urahafu | ⌘Q | `menu.quit`, quits — drops any active blocker first, exactly like the tray's Quit |
+| — | *(Window menu)* | | |
+| 4 | Close | ⌘W | `menu.close`, `NSWindow`'s own `performClose:`, routed through the responder chain rather than a specific window this crate tracks — ends up at the same `windowShouldClose:` → Close path as the red button/Esc |
+
+"File" would be the wrong menu for an app with no documents, and a bare unlabeled Cmd-W would be
+non-standard; "Window" holding just "Close" is the smallest menu that both gives Cmd-W its
+conventional home and reads as a normal Mac app menu bar. Esc still closes the settings window too
+(unchanged from the earlier settings-window pass): the window's hidden, zero-size button with the
+Escape key equivalent (`tag::ESCAPE_CLOSE`) already handles this independently of the menu bar.
 
 ## 7. Countdown
 
@@ -227,8 +360,8 @@ Hint, unlock button and remaining-time bar only appear on the main display.
 - **Optional wordmark**: "urahafu" (`overlay.wordmark`), centered, system font Medium 15 pt,
   letter-spacing 0.3 em, 10% opacity, shown only during the initial hint and disappears with it.
 - **Hint** (bottom center, baseline 152 pt from the bottom — raised from the 96 pt used before the
-  ✕ button was introduced, to leave it room below): "Hold the close button for 2 seconds to unlock"
-  (`overlay.hint.hold_to_unlock`), system font Regular 15 pt, 45% opacity.
+  ✕ button was introduced, to leave it room below): "Hold the close button or Esc + Return for
+  2 seconds to unlock" (`overlay.hint.hold_to_unlock`), system font Regular 15 pt, 45% opacity.
   The hint mentions nothing sensitive: it describes a gesture, not secret information.
 - **Second line** (22 pt below the hint, 12 pt, 28% opacity): "Space: dead-pixel test · Auto-unlock
   in 42 s" (`overlay.hint.secondary`).
@@ -244,13 +377,29 @@ Hint, unlock button and remaining-time bar only appear on the main display.
   - **Hold gesture**: a click or pointer press within the tap target starts the hold; a progress
     ring (3 pt, ink at 80%, drawn around the button, clockwise from 12 o'clock) fills linearly over
     2.0 s. Releasing or leaving the tap target before completion cancels it: the ring drains to 0
-    over 200 ms. At the end of the hold: the button briefly scales up from 1.0 to 1.1 (150 ms), then
+    over 200 ms; pressing again while it drains resumes filling from where the ring is (quick
+    repeated taps still never add up to an unlock). At the end of the hold: the button briefly scales up from 1.0 to 1.1 (150 ms), then
     the normal unlock sequence follows: input released, overlay fades out over 300 ms, closes.
+  - **Keyboard combo**: holding Escape and Return together, and no other key, for
+    the same 2.0 s drives the identical ring/scale-pulse/unlock sequence as the pointer hold, on
+    the same button — full-screen overlay and keyboard-only HUD alike. Keypad Enter counts as
+    Return. Only the two physical virtual key codes are ever read (layout-independent; no
+    character is decoded or forwarded, matching the pointer gesture's own privacy story). Any
+    other key going down while the combo is held — including a modifier key (Shift, Control,
+    Option, Command, Caps Lock, Fn) — resets its progress; the combo only (re)starts once only Esc
+    and Return are down again. If both the pointer hold and the combo are active at once, the
+    button shows whichever has progressed further (the max). Key autorepeat is ignored for the
+    combo's start/reset decisions. Space still triggers the dead-pixel test on key-down as before,
+    and also counts as "another key" for the combo, per the rule above. See
+    `docs/ARCHITECTURE.md`'s "Core types" for the exact state machine
+    (`core::combo::ComboTracker`).
   - **Hover**: when the pointer enters a 160 pt radius around the button's center, the hint and
     button reappear (200 ms fade-in) and stay visible as long as the pointer remains within that
     radius; once it leaves, the normal 2.5 s hold then a 1.2 s fade-out follow.
   - Any blocked input (any key including Esc, a click anywhere, the scroll wheel, a media key)
-    brings the hint and button back.
+    brings the hint and button back. Escape's own behavior while locked is otherwise unchanged: it
+    is just another blocked key (it does **not** cancel or unlock the session by itself — only the
+    Esc+Return hold does, exactly like the button).
 - **Remaining-time bar**: 2 pt tall, full screen width, at the very bottom of the screen, ink at
   12% opacity, shrinks linearly from right to left over the fail-safe unlock duration; opacity
   rises to 25% for the last 10 seconds. Hidden during the dead-pixel test (it would look like a
@@ -290,9 +439,12 @@ Screen stays visible; only input is blocked. A HUD (pill) informs the user of th
   - 1 px border (white 10% / black 8%), corner radius = half the height (44 pt tall), light shadow.
 - Content left to right: custom keyboard-with-lock glyph (18 pt, accent `#22B8C8`), "Keyboard
   locked" (`hud.keyboard_locked`, 13 pt SemiBold), thin vertical separator, remaining time "0:42"
-  (13 pt, tabular, 65% opacity), separator, "Hold the button 2 s" label (`hud.hold_to_unlock`, 13 pt,
-  65% opacity) followed by the small ✕ button (28 pt, 36 pt tap target), with the same hold ring as
-  the full-screen version (§8). Layout: [glyph] Keyboard locked | 0:42 | Hold the button 2 s (✕). A
+  (13 pt, tabular, 65% opacity), separator, "Hold the button or Esc + Return 2 s" label
+  (`hud.hold_to_unlock`, 13 pt, 65% opacity) followed by the small ✕ button (28 pt, 36 pt tap
+  target), with the same hold ring as the full-screen version (§8) — the Esc+Return keyboard combo
+  (§8) drives it here exactly the same way, including in this mode, since the keyboard is the only
+  input this mode ever hides the screen for in the first place. Layout: [glyph] Keyboard locked |
+  0:42 | Hold the button or Esc + Return 2 s (✕). A
   2 pt progress line along the pill's inner bottom edge (accent color) shows the time remaining
   before fail-safe unlock.
 - Always visible (no fade), clicks on it are blocked too. Countdown state: "Locking in 3"
@@ -300,61 +452,22 @@ Screen stays visible; only input is blocked. A HUD (pill) informs the user of th
 
 ## 10. First launch
 
-### Welcome alert
+There is no more welcome alert, first-launch permission alert or "You're all set!" confirmation:
+the settings window (see the "Settings window" section, above) is now the single first-contact
+surface. Opening the app for the first time shows that window; if Accessibility access is missing,
+its permission banner (`window.permission.text`) explains what's needed and its button opens
+System Settings — no separate alert chain.
 
-On the very first launch in menu bar mode, **regardless of the Accessibility permission state**, a
-welcome alert is shown once — the only place where the app explains that it runs in the background
-with a simple menu bar icon: without it, a user who already granted the permission (reinstall,
-shared Mac, permission granted manually before ever opening the app) would never see anything but
-a small icon, with no explanation of what it does or how to trigger a cleaning session.
+### Permission monitoring
 
-| | English | Key |
-|---|---|---|
-| Title | Welcome to Urahafu | `welcome.title` |
-| Text | Urahafu lets you clean your screen and keyboard without triggering anything. Its icon is in the menu bar, at the top right of the screen. While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock; otherwise the screen unlocks by itself after the delay you chose. | `welcome.text` |
-| Button | Continue *(permission missing)* or OK *(permission already granted)* | `welcome.continue` / `first_launch.ready.ok` |
-
-A single button, whose label depends on the permission state at display time: "Continue" leads
-straight into the first Accessibility permission request alert below; "OK" (the same button as the
-"You're all set!" confirmation) closes the alert, since the permission is already granted.
-Persistent setting `welcome_seen` (`core::settings::Settings`, see the "Settings" section of
-`docs/ARCHITECTURE.md`): the alert only shows once, regardless of which path follows.
-
-### Accessibility permission request
-
-While the permission is missing, the welcome alert is immediately followed by the native
-(`NSAlert`) alert with the app icon, requesting the Accessibility authorization needed to block the
-keyboard and trackpad. This alert also reappears on its own (without the welcome alert) on every
-launch as long as the permission is missing.
-
-| | English | Key |
-|---|---|---|
-| Title | Urahafu needs Accessibility access | `first_launch.title` |
-| Text | To block the keyboard and trackpad while you clean, allow Urahafu in System Settings › Privacy & Security › Accessibility. Urahafu never records or sends what you type, and never connects to the internet. | `first_launch.text` |
-| Default button | Open System Settings | `first_launch.open_settings` |
-| Secondary button | Later | `first_launch.later` |
-
-This alert's text explicitly mentions the absence of recording and network access — a security
-guarantee given at the very first contact with the user, before they even have to trust the app.
-
-### Permission monitoring and "You're all set!" confirmation
-
-As long as the app runs in menu bar mode and the permission is missing — whether it was just
-requested (via "Open System Settings" or "Later"), denied and then requested again from the error
-alert in §11 case 1, or granted by the user directly in System Settings without going through any
-of these alerts — Urahafu polls `permission::is_trusted()` periodically (every 2 s, no timeout: the
-call is cheap). As soon as the permission becomes granted, a short confirmation is shown once and
-the menu updates itself (the "Allow Accessibility Access…" item from §6 disappears):
-
-| | English | Key |
-|---|---|---|
-| Text | You're all set! While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock. Otherwise the screen unlocks by itself after the delay you chose. | `first_launch.ready.text` |
-| Button | OK | `first_launch.ready.ok` |
-
-This confirmation explains the unlock gesture before the very first session, so the user never has
-to figure it out once the screen is already locked. Monitoring never shows an alert during an
-active cleaning session (§7-§8): a transition to "granted" during a session is simply remembered,
-and the confirmation only appears once the app is back at rest (menu bar, between sessions).
+As long as Accessibility access is missing — whether the user just clicked the banner's button, or
+granted access directly in System Settings without touching the window at all, or hit the
+permission-required error alert in §11 case 1 — Urahafu polls `permission::is_trusted()`
+periodically (every 2 s, no timeout: the call is cheap), whenever the app is idle. As soon as the
+permission becomes granted, the window and tray refresh themselves (the banner disappears, the
+Clean button enables, and the tray's "Allow Accessibility Access…" item from §6 disappears) — no
+confirmation alert. Monitoring never interrupts an active cleaning session (§7-§8): a transition to
+"granted" during a session is simply picked up the next time the app is idle.
 
 ## 11. Errors
 
@@ -367,8 +480,9 @@ cases below, no cleaning overlay appears; only the error alert is shown.
 | 2. Event tap failure | Couldn't block the keyboard | Cleaning did not start so you never get stuck. Try again; if it keeps happening, log out and back in. | Try Again (default) / Cancel | `alert.tap_failed.*`, `alert.retry`, `alert.cancel` |
 | 3. Secure Input active | Secure Input is on | Another app (often an open password field) is preventing Urahafu from blocking the keyboard. Close that field or app, then try again. | Try Again (default) / Cancel | `alert.secure_input.*`, `alert.retry`, `alert.cancel` |
 
-In direct-launch mode, once the error alert is dismissed, the app quits — consistent with that
-mode's "no icon, no lingering state" principle.
+Once the error alert is dismissed, the app returns to wherever the attempt was started from — the
+settings window shows again if it was started from there, otherwise the app goes back to idle in
+the menu bar; it never exits anymore (see the "Settings window" section, item 5).
 
 ## 12. About
 
@@ -401,6 +515,10 @@ Native alert, with the app icon.
 | Fail-safe unlock | 30 / 60 / 90 s (default: 60 s) |
 | Remaining-time bar — final emphasis | last 10 seconds |
 
+The Esc+Return keyboard combo (§8) reuses the ✕ button's own hold ring fill/drain/
+scale-up durations exactly (`core::hold_ring`'s constants) — it is not a separate timing, it is the
+same 2.0 s/200 ms/150 ms applied to a different input.
+
 ## 14. Text
 
 Every user-visible string, in Urahafu's 47 languages, lives in `translations/*.xlf` (XLIFF 1.2
@@ -414,8 +532,18 @@ these files plug into Xcode, Weblate, Crowdin or Poedit, and the system-language
 `build.rs` reads `translations/*.xlf` at compile time and generates the Rust API (`Text`,
 `Language`) from it — see `src/core/i18n.rs`. This file therefore no longer needs to duplicate the
 string table; to look it up or change it, open `translations/en.xlf`. `docs/TRANSLATIONS.md`
-explicitly lists the most recently added keys (`welcome.*`, `menu.grant_access`,
-`countdown.starting`).
+explicitly lists the most recently added keys (`menu.grant_access`, `countdown.starting`,
+`menu.settings`, `window.permission.text`, `window.open_at_login.needs_icon`,
+`window.pixel_test_hint`, `menu.window`, `menu.close`).
+
+The Esc+Return combo reworded three existing keys (and reset their targets) to mention it —
+`overlay.hint.hold_to_unlock`, `countdown.unlock_explanation`,
+`hud.hold_to_unlock` — and added two new ones for the app main menu's "Window" menu —
+`menu.window`, `menu.close`. All five are listed in `src/core/i18n.rs`'s `PENDING_TRANSLATION`
+test exemption until the other 46 languages catch up. Every one of these keys' notes require
+"Esc"/"Return" to be spelled out as Apple's own localized names for those keys in that language
+(as macOS itself prints them in keyboard-shortcut notation and documentation — e.g. French "Échap"
+and "Retour"), joined with "+", and — like every hold-to-unlock string — never using ✕ or ×.
 
 ## 15. Mockup index
 
@@ -423,10 +551,10 @@ Each mockup exists as `.svg` (source) and `.png` (export), in `design/mockups/`.
 
 | File | Contents | UI language |
 |---|---|---|
-| `01-menu-fr` | Menu bar menu, in French | French |
-| `01b-menu-fr-no-permission` | Menu bar menu, in French, Accessibility permission missing (item 0 visible) | French |
-| `02-menu-en` | Menu bar menu, in English | English |
-| `03-hide-icon-confirm` | Confirmation alert before hiding the icon | French |
+| `01-menu-fr` | Menu bar menu, in French — **superseded (pre-settings-window)**: shows the old full menu (color, auto-unlock, keyboard-only, show/hide icon, open at login, about, source code), now reduced per §6 | French |
+| `01b-menu-fr-no-permission` | Menu bar menu, in French, Accessibility permission missing (item 0 visible) — **superseded (pre-settings-window)**, same reason | French |
+| `02-menu-en` | Menu bar menu, in English — **superseded (pre-settings-window)**, same reason | English |
+| `03-hide-icon-confirm` | Confirmation alert before hiding the icon — **superseded (pre-settings-window)**: this alert was removed, "Show Icon in Menu Bar" now applies live from the settings window | French |
 | `04-countdown` | Countdown screen (3-2-1) | French |
 | `05-cleaning-black` | Black cleaning screen, hint visible, in French | French |
 | `05-cleaning-black-en` | Black cleaning screen, hint visible, in English | English |
@@ -436,10 +564,10 @@ Each mockup exists as `.svg` (source) and `.png` (export), in `design/mockups/`.
 | `09-keyboard-only-dark` | Keyboard-only mode HUD, dark appearance | French |
 | `09-keyboard-only-light` | Keyboard-only mode HUD, light appearance | French |
 | `09-keyboard-only-countdown` | Keyboard-only mode HUD, countdown state | French |
-| `10-first-launch` | First permission request alert, in French | French |
-| `10-first-launch-en` | First permission request alert, in English | English |
-| `11-first-launch-ready` | Confirmation once permission is granted | French |
-| `17-welcome` | First-launch welcome alert, in French | French |
+| `10-first-launch` | First permission request alert, in French — **superseded (pre-settings-window)**: replaced by the settings window's permission banner | French |
+| `10-first-launch-en` | First permission request alert, in English — **superseded (pre-settings-window)**, same reason | English |
+| `11-first-launch-ready` | Confirmation once permission is granted — **superseded (pre-settings-window)**: this alert was removed | French |
+| `17-welcome` | First-launch welcome alert, in French — **superseded (pre-settings-window)**: this alert was removed, the settings window is now the first-contact surface | French |
 | `12-error-permission` | Error alert: missing/denied permission | French |
 | `13-error-tap-failed` | Error alert: event tap failure | French |
 | `14-error-secure-input` | Error alert: Secure Input active | French |
@@ -449,6 +577,8 @@ Each mockup exists as `.svg` (source) and `.png` (export), in `design/mockups/`.
 Most mockups depict the French localization, since it was the primary reference during design; the
 few English ones above are named with an `-en` suffix. Any macOS menu-bar chrome shown around the
 mockups (`File`, `Edit`, `Finder`, …) follows the same language as the mockup's own UI text.
+Mockups marked "superseded (pre-settings-window)" are kept for traceability rather than deleted;
+there is no settings-window mockup yet — the layout above (and the code) is its source of truth.
 
 <img src="mockups/01-menu-fr.png" width="280" alt="Menu bar menu (French)">
 <img src="mockups/05-cleaning-black.png" width="280" alt="Black cleaning screen">

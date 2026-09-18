@@ -10,6 +10,7 @@
 pub mod ffi;
 
 pub mod alert;
+pub mod app_menu;
 pub mod input_blocker;
 pub mod login_item;
 pub mod permission;
@@ -18,4 +19,5 @@ pub mod system;
 pub mod text;
 
 pub mod overlay;
+pub mod settings_window;
 pub mod tray;
