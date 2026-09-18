@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect x="0" y="0" width="1440" height="900" fill="#FFFFFF"/>
+
+  <!-- Hint (re-shown / held state, fully visible — the button shares its opacity curve, and stays
+       fully visible while it's being held) -->
+  <text x="720" y="748" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="15"
+        fill="#000000" fill-opacity="0.45">Maintenez la croix 2 secondes pour déverrouiller</text>
+
+  <!-- Second line -->
+  <text x="720" y="770" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="12"
+        fill="#000000" fill-opacity="0.28">Espace&#160;: test des pixels morts&#160;·&#160;Déverrouillage automatique dans 42&#160;s</text>
+
+  <!-- ✕ unlock button, mid-hold: progress ring ~60% filled, clockwise from 12 o'clock -->
+  <g transform="translate(720,812)">
+    <circle r="32" fill="#000000" fill-opacity="0.05"/>
+    <circle r="22" fill="#000000" fill-opacity="0.10"/>
+    <!-- base ring track -->
+    <circle r="22" fill="none" stroke="#000000" stroke-opacity="0.15" stroke-width="3"/>
+    <!-- progress ring, ~60% of 2.0s hold: circumference 2*pi*22≈138.2, 60% ≈ 82.9 -->
+    <circle r="22" fill="none" stroke="#000000" stroke-opacity="0.80" stroke-width="3"
+            stroke-dasharray="82.9 138.2" stroke-linecap="round"
+            transform="rotate(-90)"/>
+    <g stroke="#000000" stroke-opacity="0.85" stroke-width="2" stroke-linecap="round">
+      <line x1="-7" y1="-7" x2="7" y2="7"/>
+      <line x1="7" y1="-7" x2="-7" y2="7"/>
+    </g>
+  </g>
+
+  <!-- Remaining-time bar — ~40% remaining -->
+  <rect x="0" y="898" width="576" height="2" fill="#000000" fill-opacity="0.12"/>
+</svg>

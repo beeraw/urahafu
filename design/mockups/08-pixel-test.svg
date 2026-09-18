@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <defs>
+    <clipPath id="detailClip">
+      <rect x="0" y="0" width="1440" height="900" rx="14"/>
+    </clipPath>
+  </defs>
+  <rect x="0" y="0" width="1440" height="900" fill="#F5F5F7"/>
+
+  <text x="720" y="112" text-anchor="middle" font-family="SF Pro Display" font-weight="600" font-size="26"
+        fill="#1D1D1F" fill-opacity="0.9">Test des pixels morts</text>
+
+  <!-- 6 frames: red, green, blue, white, black, "chosen color" -->
+  <!-- row: 6 * 170 + 5 * 36 = 1200, start x = 120, y = 190, size 170x106 -->
+  <g id="frames" font-family="SF Pro Text" font-weight="400" font-size="12">
+    <g>
+      <rect x="120" y="190" width="170" height="106" rx="6" fill="#FF0000"/>
+      <text x="205" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Rouge</text>
+    </g>
+    <g>
+      <rect x="326" y="190" width="170" height="106" rx="6" fill="#00FF00"/>
+      <text x="411" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Vert</text>
+    </g>
+    <g>
+      <rect x="532" y="190" width="170" height="106" rx="6" fill="#0000FF"/>
+      <text x="617" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Bleu</text>
+    </g>
+    <g>
+      <rect x="738" y="190" width="170" height="106" rx="6" fill="#FFFFFF" stroke="#1D1D1F" stroke-opacity="0.12"/>
+      <text x="823" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Blanc</text>
+    </g>
+    <g>
+      <rect x="944" y="190" width="170" height="106" rx="6" fill="#000000"/>
+      <text x="1029" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Noir</text>
+    </g>
+    <g>
+      <defs>
+        <clipPath id="chosenClip"><rect x="1150" y="190" width="170" height="106" rx="6"/></clipPath>
+      </defs>
+      <g clip-path="url(#chosenClip)">
+        <rect x="1150" y="190" width="170" height="106" fill="#000000"/>
+        <rect x="1150" y="190" width="170" height="53" fill="#FFFFFF"/>
+      </g>
+      <rect x="1150" y="190" width="170" height="106" rx="6" fill="none" stroke="#1D1D1F" stroke-opacity="0.35" stroke-dasharray="4 3"/>
+      <text x="1235" y="320" text-anchor="middle" fill="#1D1D1F" fill-opacity="0.55">Choisie</text>
+    </g>
+  </g>
+
+  <!-- Sequence caption -->
+  <text x="720" y="372" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="14"
+        fill="#1D1D1F" fill-opacity="0.6">Espace&#160;: rouge&#160;→ vert&#160;→ bleu&#160;→ blanc&#160;→ noir&#160;→ couleur choisie</text>
+
+  <!-- Detail: hint re-shown mid-test, on green, with step indicator -->
+  <text x="720" y="432" text-anchor="middle" font-family="SF Pro Text" font-weight="600" font-size="15"
+        fill="#1D1D1F" fill-opacity="0.75">Détail — l'indice réaffiché pendant le test (étape 2/5)</text>
+  <text x="720" y="452" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="11"
+        fill="#1D1D1F" fill-opacity="0.45">(texte agrandi pour lisibilité)</text>
+
+  <!-- frame enlarged (560x350, scale 0.38889) vs. the small swatches above, so the hint stays legible;
+       proportions of the underlying 1440x900 screen are preserved -->
+  <g transform="translate(440,470) scale(0.38889)">
+    <g clip-path="url(#detailClip)">
+      <rect x="0" y="0" width="1440" height="900" fill="#00FF00"/>
+
+      <!-- hint — luminance rule: BLACK ink on green/white, white ink on red/blue/black -->
+      <text x="720" y="748" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="20"
+            fill="#1D1D1F" fill-opacity="0.55">Maintenez la croix 2 secondes pour déverrouiller</text>
+
+      <!-- second line + step indicator "2/5" next to it -->
+      <text x="720" y="778" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="15"
+            fill="#1D1D1F" fill-opacity="0.38">Espace&#160;: test des pixels morts&#160;·&#160;Déverrouillage automatique dans 42&#160;s</text>
+      <text x="1140" y="778" text-anchor="start" font-family="SF Pro Text" font-weight="400" font-size="13"
+            fill="#1D1D1F" fill-opacity="0.35">2/5</text>
+
+      <!-- ✕ unlock button, black ink on green, same layout as the full-size mockups -->
+      <g transform="translate(720,820)">
+        <circle r="32" fill="#1D1D1F" fill-opacity="0.05"/>
+        <circle r="22" fill="#1D1D1F" fill-opacity="0.10"/>
+        <circle r="22" fill="none" stroke="#1D1D1F" stroke-opacity="0.30" stroke-width="1"/>
+        <g stroke="#1D1D1F" stroke-opacity="0.80" stroke-width="2" stroke-linecap="round">
+          <line x1="-7" y1="-7" x2="7" y2="7"/>
+          <line x1="7" y1="-7" x2="-7" y2="7"/>
+        </g>
+      </g>
+    </g>
+    <rect x="0" y="0" width="1440" height="900" rx="14" fill="none" stroke="#1D1D1F" stroke-opacity="0.15" stroke-width="4"/>
+  </g>
+
+  <text x="720" y="850" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="12"
+        fill="#1D1D1F" fill-opacity="0.5">Encre noire sur vert et blanc, encre blanche sur rouge, bleu et noir&#160;— pas de barre, pas de wordmark pendant le test</text>
+</svg>

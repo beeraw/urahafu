@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="ar" datatype="plaintext" original="urahafu">
+    <header>
+      <note from="urahafu:language-name">العربية</note>
+      <note from="urahafu:direction">rtl</note>
+    </header>
+    <body>
+      <trans-unit id="menu.clean_screen">
+        <source>Clean Screen</source>
+        <target>تنظيف الشاشة</target>
+        <note>Menu item shown when keyboard-only mode is off. Keep short: appears in the macOS menu bar dropdown.</note>
+      </trans-unit>
+      <trans-unit id="menu.clean_keyboard">
+        <source>Clean Keyboard</source>
+        <target>تنظيف لوحة المفاتيح</target>
+        <note>Menu item shown when keyboard-only mode is on (replaces menu.clean_screen). Keep short.</note>
+      </trans-unit>
+      <trans-unit id="menu.keyboard_only_mode">
+        <source>Keyboard Only Mode</source>
+        <target>وضع لوحة المفاتيح فقط</target>
+        <note>Menu checkbox item toggling keyboard-only mode.</note>
+      </trans-unit>
+      <trans-unit id="menu.color">
+        <source>Color</source>
+        <target>اللون</target>
+        <note>Menu submenu title grouping the cleaning color choice (Black/White).</note>
+      </trans-unit>
+      <trans-unit id="menu.color.black">
+        <source>Black</source>
+        <target>أسود</target>
+        <note>Menu submenu item: the black cleaning screen color.</note>
+      </trans-unit>
+      <trans-unit id="menu.color.white">
+        <source>White</source>
+        <target>أبيض</target>
+        <note>Menu submenu item: the white cleaning screen color.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock">
+        <source>Auto-Unlock</source>
+        <target>إلغاء القفل التلقائي</target>
+        <note>Menu submenu title grouping the fail-safe auto-unlock delay choices.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_30s">
+        <source>After 30 s</source>
+        <target>بعد 30 ثانية</target>
+        <note>Menu submenu item: auto-unlock after 30 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_60s">
+        <source>After 60 s</source>
+        <target>بعد 60 ثانية</target>
+        <note>Menu submenu item: auto-unlock after 60 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_90s">
+        <source>After 90 s</source>
+        <target>بعد 90 ثانية</target>
+        <note>Menu submenu item: auto-unlock after 90 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.show_icon">
+        <source>Show Icon in Menu Bar</source>
+        <target>إظهار الأيقونة في شريط القوائم</target>
+        <note>Menu checkbox: whether to keep showing the Urahafu icon in the menu bar.</note>
+      </trans-unit>
+      <trans-unit id="menu.open_at_login">
+        <source>Open at Login</source>
+        <target>الفتح عند تسجيل الدخول</target>
+        <note>Menu checkbox: whether Urahafu launches automatically at login.</note>
+      </trans-unit>
+      <trans-unit id="menu.about">
+        <source>About Urahafu</source>
+        <target>حول Urahafu</target>
+        <note>Menu item opening the About alert.</note>
+      </trans-unit>
+      <trans-unit id="menu.source_code">
+        <source>Source Code on GitHub…</source>
+        <target>الكود المصدري على GitHub…</target>
+        <note>Menu item opening the project's GitHub page in the browser.</note>
+      </trans-unit>
+      <trans-unit id="menu.quit">
+        <source>Quit Urahafu</source>
+        <target>إنهاء Urahafu</target>
+        <note>Menu item quitting the app.</note>
+      </trans-unit>
+      <trans-unit id="menu.grant_access">
+        <source>Allow Accessibility Access…</source>
+        <target>السماح بالوصول إلى Accessibility…</target>
+        <note>Menu item shown above 'Clean Screen'/'Clean Keyboard' (followed by a separator) only while Accessibility access is missing; opens System Settings on the Accessibility pane. Disappears once access is granted.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.title">
+        <source>Hide the Urahafu icon?</source>
+        <target>هل تريد إخفاء أيقونة Urahafu؟</target>
+        <note>Title of the confirmation alert shown before hiding the menu bar icon.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.text">
+        <source>Urahafu will start cleaning right away each time you open it. To get this menu back, hold Option while opening Urahafu.</source>
+        <target>سيبدأ Urahafu التنظيف فورًا في كل مرة تفتحه فيها. لاسترجاع هذه القائمة، اضغط باستمرار على مفتاح Option أثناء فتح Urahafu.</target>
+        <note>Body of the hide-icon confirmation alert. Explains that Urahafu will clean immediately on launch, and how to get the menu back (hold Option while opening).</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.confirm">
+        <source>Hide Icon</source>
+        <target>إخفاء الأيقونة</target>
+        <note>Default (destructive) button of the hide-icon confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.cancel">
+        <source>Cancel</source>
+        <target>إلغاء</target>
+        <note>Cancel button of the hide-icon confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="countdown.starting">
+        <source>Cleaning is about to start</source>
+        <target>التنظيف على وشك البدء</target>
+        <note>Label shown above the big countdown digit before cleaning starts. Unlike the digit itself (3, 2, 1) this text does not change between seconds, so it must not reference a specific count.</note>
+      </trans-unit>
+      <trans-unit id="countdown.cancel_hint">
+        <source>Esc or click to cancel</source>
+        <target>اضغط على Esc أو انقر للإلغاء</target>
+        <note>Small hint below the countdown digit explaining how to cancel it.</note>
+      </trans-unit>
+      <trans-unit id="overlay.wordmark">
+        <source>urahafu</source>
+        <target>urahafu</target>
+        <note>The app's wordmark shown on the full-screen cleaning overlay. This is a proper noun (the app's name) and must stay 'urahafu', unchanged, in every language.</note>
+      </trans-unit>
+      <trans-unit id="overlay.hint.hold_to_unlock">
+        <source>Hold the close button for 2 seconds to unlock</source>
+        <target>اضغط مع الاستمرار على زر الإغلاق لمدة ثانيتين لإلغاء القفل</target>
+        <note>Full-screen overlay hint explaining the hold-to-unlock gesture. Spells out 'close button' in words rather than using the ✕ glyph inline: next to a number ('✕ 2 seconds') the glyph would read as a multiplication sign. Never use ✕ or × in this string.</note>
+      </trans-unit>
+      <trans-unit id="countdown.unlock_explanation">
+        <source>To unlock, hold the close button for 2 seconds</source>
+        <target>لإلغاء القفل، اضغط مع الاستمرار على زر الإغلاق لمدة ثانيتين</target>
+        <note>Countdown screen's explanation of the hold-to-unlock gesture, shown while the countdown to locking is still running. Same wording constraint as overlay.hint.hold_to_unlock: spell out the button, never use ✕ or ×.</note>
+      </trans-unit>
+      <trans-unit id="hud.keyboard_locked">
+        <source>Keyboard locked</source>
+        <target>لوحة المفاتيح مقفلة</target>
+        <note>Keyboard-only mode HUD: compact pill shown while the keyboard is locked. Keep this very short, it renders in a small rounded pill.</note>
+      </trans-unit>
+      <trans-unit id="hud.hold_to_unlock">
+        <source>Hold the button 2 s</source>
+        <target>اضغط باستمرار على الزر ثانيتين</target>
+        <note>Keyboard-only mode HUD: compact hold-to-unlock hint next to the ✕ button. Keep very short (HUD pill). Spell out 'button' in words, never use ✕ or × inline next to the number.</note>
+      </trans-unit>
+      <trans-unit id="welcome.title">
+        <source>Welcome to Urahafu</source>
+        <target>مرحبًا بك في Urahafu</target>
+        <note>Title of the welcome alert shown once on first launch in menu-bar mode, whatever the Accessibility permission state.</note>
+      </trans-unit>
+      <trans-unit id="welcome.text">
+        <source>Urahafu lets you clean your screen and keyboard without triggering anything. Its icon is in the menu bar, at the top right of the screen. While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock; otherwise the screen unlocks by itself after the delay you chose.</source>
+        <target>يتيح لك Urahafu تنظيف الشاشة ولوحة المفاتيح دون تشغيل أي شيء. يوجد رمزه في شريط القوائم، أعلى يمين الشاشة. أثناء التنظيف، اضغط مع الاستمرار على زر الإغلاق أسفل الشاشة لمدة ثانيتين لإلغاء القفل؛ وإلا فإن الشاشة تُلغى قفلها تلقائيًا بعد المهلة التي اخترتها.</target>
+        <note>Body of the welcome alert: explains where to find the menu bar icon (easy to miss) and the hold-to-unlock gesture, since the app only ever shows a small icon otherwise. Shown whatever the Accessibility permission state.</note>
+      </trans-unit>
+      <trans-unit id="welcome.continue">
+        <source>Continue</source>
+        <target>متابعة</target>
+        <note>Button of the welcome alert shown when Accessibility access is still missing; leads into the existing first-launch permission alert (first_launch.*) right after.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.title">
+        <source>Urahafu needs Accessibility access</source>
+        <target>يحتاج Urahafu إلى إذن الوصول لتسهيلات الاستخدام</target>
+        <note>Title of the first-launch alert asking for Accessibility permission.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.text">
+        <source>To block the keyboard and trackpad while you clean, allow Urahafu in System Settings › Privacy &amp; Security › Accessibility. Urahafu never records or sends what you type, and never connects to the internet.</source>
+        <target>لمنع لوحة المفاتيح ولوحة التتبع أثناء التنظيف، امنح الإذن لتطبيق Urahafu في إعدادات النظام › الخصوصية والأمن › تسهيلات الاستخدام. لا يسجل Urahafu أو يرسل أبدًا ما تكتبه، ولا يتصل بالإنترنت مطلقًا.</target>
+        <note>Body of the first-launch alert. Explains why Accessibility access is needed, the exact System Settings path, and reassures that Urahafu never records keystrokes or connects to the internet. Use the official macOS 13+ System Settings labels for this language (System Settings › Privacy &amp; Security → Accessibility).</note>
+      </trans-unit>
+      <trans-unit id="first_launch.open_settings">
+        <source>Open System Settings</source>
+        <target>فتح إعدادات النظام</target>
+        <note>Default button of the first-launch alert, opens System Settings.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.later">
+        <source>Later</source>
+        <target>لاحقًا</target>
+        <note>Secondary button of the first-launch alert, dismisses without opening Settings.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.ready.text">
+        <source>You're all set! While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock. Otherwise the screen unlocks by itself after the delay you chose.</source>
+        <target>كل شيء جاهز! أثناء التنظيف، اضغط مع الاستمرار على زر الإغلاق أسفل الشاشة لمدة ثانيتين لإلغاء القفل. بخلاف ذلك، تُلغى قفل الشاشة تلقائيًا بعد المدة التي اخترتها.</target>
+        <note>Body of the confirmation alert shown once Accessibility access has been granted, explaining the hold-to-unlock gesture and the fail-safe auto-unlock.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.ready.ok">
+        <source>OK</source>
+        <target>موافق</target>
+        <note>OK button of the first-launch-ready confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.title">
+        <source>Accessibility access required</source>
+        <target>مطلوب إذن الوصول لتسهيلات الاستخدام</target>
+        <note>Title of the error alert shown when Accessibility access is missing at cleaning time.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.text">
+        <source>Urahafu can't block the keyboard without this permission. Cleaning did not start.</source>
+        <target>لا يمكن لـ Urahafu منع لوحة المفاتيح بدون هذا الإذن. لم يبدأ التنظيف.</target>
+        <note>Body of the permission-missing error alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.open_settings">
+        <source>Open System Settings</source>
+        <target>فتح إعدادات النظام</target>
+        <note>Default button of the permission-missing alert, opens System Settings.</note>
+      </trans-unit>
+      <trans-unit id="alert.tap_failed.title">
+        <source>Couldn't block the keyboard</source>
+        <target>تعذر منع لوحة المفاتيح</target>
+        <note>Title of the error alert shown when the keyboard event tap could not be installed.</note>
+      </trans-unit>
+      <trans-unit id="alert.tap_failed.text">
+        <source>Cleaning did not start so you never get stuck. Try again; if it keeps happening, log out and back in.</source>
+        <target>لم يبدأ التنظيف حتى لا تبقى عالقًا. حاول مرة أخرى؛ وإذا استمرت المشكلة، سجّل الخروج ثم الدخول مرة أخرى.</target>
+        <note>Body of the event-tap-failed error alert, suggests retrying or logging out and back in.</note>
+      </trans-unit>
+      <trans-unit id="alert.secure_input.title">
+        <source>Secure Input is on</source>
+        <target>الإدخال الآمن مفعّل</target>
+        <note>Title of the error alert shown when macOS Secure Input is blocking Urahafu.</note>
+      </trans-unit>
+      <trans-unit id="alert.secure_input.text">
+        <source>Another app (often an open password field) is preventing Urahafu from blocking the keyboard. Close that field or app, then try again.</source>
+        <target>يمنع تطبيق آخر (غالبًا حقل كلمة مرور مفتوح) تطبيق Urahafu من منع لوحة المفاتيح. أغلق ذلك الحقل أو التطبيق، ثم حاول مرة أخرى.</target>
+        <note>Body of the Secure-Input-active error alert, suggests closing the app or field responsible.</note>
+      </trans-unit>
+      <trans-unit id="alert.retry">
+        <source>Try Again</source>
+        <target>إعادة المحاولة</target>
+        <note>Default button on error alerts, retries the action.</note>
+      </trans-unit>
+      <trans-unit id="alert.cancel">
+        <source>Cancel</source>
+        <target>إلغاء</target>
+        <note>Cancel button shared by several alerts.</note>
+      </trans-unit>
+      <trans-unit id="about.tagline">
+        <source>Clean your screen and keyboard without triggering anything.</source>
+        <target>نظّف شاشتك ولوحة مفاتيحك دون تفعيل أي شيء.</target>
+        <note>Tagline shown in the About alert, under the app name.</note>
+      </trans-unit>
+      <trans-unit id="about.license">
+        <source>Free software, MIT License</source>
+        <target>برنامج حر، مرخّص بموجب MIT</target>
+        <note>License line shown in the About alert.</note>
+      </trans-unit>
+      <trans-unit id="about.view_on_github">
+        <source>View on GitHub</source>
+        <target>عرض على GitHub</target>
+        <note>Secondary button in the About alert, opens the GitHub repository.</note>
+      </trans-unit>
+      <trans-unit id="about.ok">
+        <source>OK</source>
+        <target>موافق</target>
+        <note>Default (OK) button in the About alert.</note>
+      </trans-unit>
+      <trans-unit id="countdown.locking_in">
+        <source>Locking in {n}</source>
+        <target>القفل خلال {n}</target>
+        <note>Keyboard-only mode's countdown label counting down to the keyboard lock, e.g. 'Locking in' 3, 2, 1. {n} is the remaining digit (a single-digit integer, no unit needed unless natural in this language).</note>
+      </trans-unit>
+      <trans-unit id="overlay.hint.secondary">
+        <source>Space: dead-pixel test · Auto-unlock in {seconds} s</source>
+        <target>مسطرة المسافة: اختبار البكسل الميت · إلغاء القفل تلقائيًا خلال {seconds} ثانية</target>
+        <note>Second line of text on the full-screen cleaning overlay: dead-pixel test hint plus the remaining fail-safe auto-unlock time. {seconds} is the number of seconds left, always shown with plain digits (0-9), never native digit forms.</note>
+      </trans-unit>
+      <trans-unit id="about.version">
+        <source>Version {version}</source>
+        <target>الإصدار {version}</target>
+        <note>Version line shown in the About alert, e.g. 'Version 1.0.0'. {version} is the crate's semantic version string, inserted verbatim (never translated or reformatted).</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

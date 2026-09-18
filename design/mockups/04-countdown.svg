@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect x="0" y="0" width="1440" height="900" fill="#000000"/>
+
+  <!-- "Cleaning is about to start" label (French UI text shown) — 17pt Regular, 40% opacity,
+       baseline 110pt above digit visual center (450). Unlike the digit below, this text does not
+       change between 3, 2 and 1. -->
+  <text x="720" y="340" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="17"
+        fill="#FFFFFF" fill-opacity="0.40">Le nettoyage va commencer</text>
+
+  <!-- Digit "3" — Inter Light 300, 160pt, 60% opacity, tabular figures, visually centered at y=450 -->
+  <text x="720" y="450" text-anchor="middle" dominant-baseline="central" font-family="SF Pro Display" font-weight="300"
+        font-size="160" font-feature-settings="'tnum' 1" fill="#FFFFFF" fill-opacity="0.60">3</text>
+
+  <!-- Explanation line under the digit — 15pt Regular, 45% opacity -->
+  <text x="720" y="560" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="15"
+        fill="#FFFFFF" fill-opacity="0.45">Pour déverrouiller, maintenez la croix 2 secondes</text>
+
+  <!-- "Esc or click to cancel" hint (French UI text shown) — 13pt, 30% opacity, positioned above
+       the ✕ button with >=16pt clear space to its 64pt hit circle (button center 822, hit top
+       790; baseline 769 leaves ~16.5pt after the font's own descent) — see
+       Layout::countdown_cancel_hint. -->
+  <text x="720" y="769" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="13"
+        fill="#FFFFFF" fill-opacity="0.30">Échap ou clic pour annuler</text>
+
+  <!-- ✕ unlock button at its final position (same as the locked screen's Layout::unlock_button,
+       center y = height - 56 - 22 = 822 on this 900pt reference screen), pulsing (mid-pulse ~80%
+       opacity), not holdable yet -->
+  <g transform="translate(720,822)">
+    <circle r="32" fill="#FFFFFF" fill-opacity="0.08"/>
+    <circle r="22" fill="#FFFFFF" fill-opacity="0.10"/>
+    <circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity="0.24" stroke-width="1"/>
+    <g stroke="#FFFFFF" stroke-opacity="0.64" stroke-width="2" stroke-linecap="round">
+      <line x1="-7" y1="-7" x2="7" y2="7"/>
+      <line x1="7" y1="-7" x2="-7" y2="7"/>
+    </g>
+  </g>
+</svg>

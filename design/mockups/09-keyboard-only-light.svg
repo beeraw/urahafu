@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <defs>
+    <linearGradient id="wallpaperLight" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF7F8"/>
+      <stop offset="1" stop-color="#FDFEFE"/>
+    </linearGradient>
+    <g id="kbLockGlyphLight">
+      <!-- keyboard body -->
+      <rect x="0.5" y="5.5" width="17" height="10" rx="2" fill="none" stroke="#0A7C93" stroke-width="1.3"/>
+      <g fill="#0A7C93">
+        <rect x="2.5" y="7.7" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="5.3" y="7.7" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="8.1" y="7.7" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="10.9" y="7.7" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="13.7" y="7.7" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="2.5" y="10.3" width="1.6" height="1.6" rx="0.3"/>
+        <rect x="5.3" y="10.3" width="7" height="1.6" rx="0.3"/>
+        <rect x="13.7" y="10.3" width="1.6" height="1.6" rx="0.3"/>
+      </g>
+      <!-- padlock badge, top-right, slightly overlapping the keyboard body -->
+      <circle cx="14.2" cy="4.6" r="5.1" fill="#F6F6F8"/>
+      <path d="M12.15 4.35 v-1.05 a2.05 2.05 0 0 1 4.1 0 v1.05" fill="none" stroke="#0A7C93" stroke-width="1.05" stroke-linecap="round"/>
+      <rect x="11.75" y="4.15" width="4.9" height="3.7" rx="0.9" fill="#0A7C93"/>
+    </g>
+  </defs>
+
+  <!-- wallpaper (full canvas, menu bar overlays it translucently) -->
+  <rect x="0" y="0" width="1440" height="900" fill="url(#wallpaperLight)"/>
+
+  <!-- menu bar -->
+  <rect x="0" y="0" width="1440" height="24" fill="#FFFFFF" fill-opacity="0.6"/>
+  <text x="20" y="16" font-family="SF Pro Text" font-weight="600" font-size="12" fill="#1D1D1F" fill-opacity="0.9">Finder</text>
+  <text x="86" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Fichier</text>
+  <text x="146" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Édition</text>
+  <text x="208" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Présentation</text>
+  <text x="304" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Aller</text>
+  <text x="360" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Fenêtre</text>
+  <text x="422" y="16" font-family="SF Pro Text" font-weight="400" font-size="12" fill="#1D1D1F" fill-opacity="0.75">Aide</text>
+  <!-- our menu bar icon, right end -->
+  <g transform="translate(1404,3.5) scale(0.94)">
+    <rect x="2" y="2.6" width="14" height="9.8" rx="1.8" fill="none" stroke="#1D1D1F" stroke-opacity="0.85" stroke-width="1.5" stroke-linejoin="round"/>
+    <rect x="8.1" y="12.4" width="1.8" height="1.5" fill="#1D1D1F" fill-opacity="0.85"/>
+    <rect x="5.3" y="13.9" width="7.4" height="1.4" rx="0.7" fill="#1D1D1F" fill-opacity="0.85"/>
+  </g>
+
+  <!-- generic window -->
+  <g>
+    <rect x="150" y="160" width="520" height="330" rx="12" fill="#FFFFFF" fill-opacity="0.97" stroke="#1D1D1F" stroke-opacity="0.08"/>
+    <rect x="150" y="160" width="520" height="34" rx="12" fill="#F3F3F4"/>
+    <rect x="150" y="182" width="520" height="12" fill="#F3F3F4"/>
+    <circle cx="172" cy="177" r="5.5" fill="#FF5F57"/>
+    <circle cx="190" cy="177" r="5.5" fill="#FEBC2E"/>
+    <circle cx="208" cy="177" r="5.5" fill="#28C840"/>
+    <g fill="#1D1D1F" fill-opacity="0.12">
+      <rect x="180" y="222" width="320" height="9" rx="4"/>
+      <rect x="180" y="248" width="420" height="9" rx="4"/>
+      <rect x="180" y="274" width="260" height="9" rx="4"/>
+      <rect x="180" y="300" width="380" height="9" rx="4"/>
+      <rect x="180" y="326" width="200" height="9" rx="4"/>
+    </g>
+  </g>
+
+  <!-- HUD pill: x 488-960, y 36-80, r=22 (widened slightly for the "Hold the button 2 s" label (French UI text shown) + button) -->
+  <rect x="488" y="36" width="472" height="44" rx="22" fill="#F6F6F8" fill-opacity="0.9" stroke="#000000" stroke-opacity="0.08"/>
+
+  <use href="#kbLockGlyphLight" x="512" y="49"/>
+
+  <text x="544" y="63" font-family="SF Pro Text" font-weight="600" font-size="13" fill="#1D1D1F" fill-opacity="0.92">Clavier verrouillé</text>
+
+  <line x1="680" y1="46" x2="680" y2="70" stroke="#000000" stroke-opacity="0.12"/>
+
+  <text x="696" y="63" font-family="SF Pro Text" font-weight="400" font-size="13" fill="#1D1D1F" fill-opacity="0.65" font-feature-settings="'tnum' 1">0:42</text>
+
+  <line x1="742" y1="46" x2="742" y2="70" stroke="#000000" stroke-opacity="0.12"/>
+
+  <text x="758" y="63" font-family="SF Pro Text" font-weight="400" font-size="13" fill="#1D1D1F" fill-opacity="0.65">Maintenez la croix 2 s</text>
+
+  <!-- small ✕ button, 28pt visual / 36pt hit target, right end of the pill -->
+  <g transform="translate(930,58)">
+    <circle r="18" fill="#1D1D1F" fill-opacity="0.04"/>
+    <circle r="14" fill="#1D1D1F" fill-opacity="0.08"/>
+    <circle r="14" fill="none" stroke="#1D1D1F" stroke-opacity="0.25" stroke-width="1"/>
+    <g stroke="#1D1D1F" stroke-opacity="0.75" stroke-width="1.6" stroke-linecap="round">
+      <line x1="-4.5" y1="-4.5" x2="4.5" y2="4.5"/>
+      <line x1="4.5" y1="-4.5" x2="-4.5" y2="4.5"/>
+    </g>
+  </g>
+
+  <!-- progress line, bottom inner edge of pill, accent -->
+  <rect x="500" y="76" width="274" height="2" rx="1" fill="#22B8C8"/>
+</svg>

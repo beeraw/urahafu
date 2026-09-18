@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+  <!-- Display: rounded screen outline + stand -->
+  <rect x="2" y="2.6" width="14" height="9.8" rx="1.8"
+    fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- stand -->
+  <rect x="8.1" y="12.4" width="1.8" height="1.5" fill="#000"/>
+  <rect x="5.3" y="13.9" width="7.4" height="1.4" rx="0.7" fill="#000"/>
+  <!-- main sparkle, inside the screen, slightly right of center -->
+  <path fill="#000" d="M10.3 4.5 Q10.88 6.81 13.3 7.5 Q10.88 8.19 10.3 10.5 Q9.72 8.19 7.3 7.5 Q9.72 6.81 10.3 4.5 Z"/>
+  <!-- small companion sparkle, upper-left inside the screen -->
+  <path fill="#000" d="M5.1 3.8 Q5.39 4.95 6.6 5.3 Q5.39 5.65 5.1 6.8 Q4.81 5.65 3.6 5.3 Q4.81 4.95 5.1 3.8 Z"/>
+</svg>

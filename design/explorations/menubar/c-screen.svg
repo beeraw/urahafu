@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+  <defs>
+    <clipPath id="screenClip">
+      <rect x="2.75" y="3.35" width="12.5" height="8.3" rx="1.1"/>
+    </clipPath>
+  </defs>
+  <!-- Display: rounded screen outline + stand -->
+  <rect x="2" y="2.6" width="14" height="9.8" rx="1.8"
+    fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- single glare stripe, clipped to the screen interior -->
+  <g clip-path="url(#screenClip)">
+    <path fill="none" stroke="#000" stroke-width="1.3" stroke-linecap="round"
+      d="M5.6 4.3 L10.8 10.8"/>
+  </g>
+  <!-- stand -->
+  <rect x="8.1" y="12.4" width="1.8" height="1.5" fill="#000"/>
+  <rect x="5.3" y="13.9" width="7.4" height="1.4" rx="0.7" fill="#000"/>
+  <!-- sparkle -->
+  <path fill="#000" d="
+    M15.5 1.5
+    Q15.75 2.5 16.8 2.8
+    Q15.75 3.1 15.5 4.1
+    Q15.25 3.1 14.2 2.8
+    Q15.25 2.5 15.5 1.5
+    Z
+  "/>
+</svg>

@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: Build and publish
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-apple-darwin,aarch64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build both architectures
+        run: |
+          cargo build --release --locked --target x86_64-apple-darwin
+          cargo build --release --locked --target aarch64-apple-darwin
+
+      - name: Combine into a universal binary
+        run: |
+          mkdir -p target/universal
+          lipo -create -output target/universal/urahafu \
+            target/x86_64-apple-darwin/release/urahafu \
+            target/aarch64-apple-darwin/release/urahafu
+          lipo -info target/universal/urahafu
+
+      - name: Install cargo-bundle
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-bundle
+
+      - name: Bundle the .app
+        run: |
+          # cargo-bundle only knows how to build for the host target, so it
+          # produces an app bundle containing a single-arch binary. We then
+          # swap that binary for the universal one built above, which keeps
+          # cargo-bundle's Info.plist/icon handling while shipping a
+          # universal executable inside Urahafu.app. cargo-bundle has no
+          # --locked flag; the lockfile was already enforced by the builds above.
+          cargo bundle --release
+          cp target/universal/urahafu "target/release/bundle/osx/Urahafu.app/Contents/MacOS/urahafu"
+
+      - name: Ad-hoc codesign
+        run: codesign --force --deep -s - "target/release/bundle/osx/Urahafu.app"
+
+      - name: Zip the app
+        working-directory: target/release/bundle/osx
+        run: ditto -c -k --keepParent "Urahafu.app" "Urahafu-${{ steps.version.outputs.version }}.zip"
+
+      - name: Checksum
+        working-directory: target/release/bundle/osx
+        run: shasum -a 256 "Urahafu-${{ steps.version.outputs.version }}.zip" > "Urahafu-${{ steps.version.outputs.version }}.zip.sha256"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: target/release/bundle/osx
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            "Urahafu-${{ steps.version.outputs.version }}.zip" \
+            "Urahafu-${{ steps.version.outputs.version }}.zip.sha256" \
+            --title "Urahafu ${{ github.ref_name }}" \
+            --generate-notes

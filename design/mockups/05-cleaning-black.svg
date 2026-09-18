@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect x="0" y="0" width="1440" height="900" fill="#000000"/>
+
+  <!-- Wordmark "urahafu" — Inter Medium 15pt, letter-spacing 0.3em, 10% opacity, centered -->
+  <text x="720" y="450" text-anchor="middle" font-family="SF Pro Text" font-weight="500" font-size="15"
+        letter-spacing="4.5" fill="#FFFFFF" fill-opacity="0.10">urahafu</text>
+
+  <!-- Hint — baseline 152pt from bottom (900-152=748), 15pt Regular 45% (raised from the old 96pt
+       to make room for the ✕ button below) -->
+  <text x="720" y="748" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="15"
+        fill="#FFFFFF" fill-opacity="0.45">Maintenez la croix 2 secondes pour déverrouiller</text>
+
+  <!-- Second line — 22pt below hint baseline (748+22=770), 12pt, 28% opacity -->
+  <text x="720" y="770" text-anchor="middle" font-family="SF Pro Text" font-weight="400" font-size="12"
+        fill="#FFFFFF" fill-opacity="0.28">Espace&#160;: test des pixels morts&#160;·&#160;Déverrouillage automatique dans 42&#160;s</text>
+
+  <!-- ✕ unlock button — 20pt below second line (770+20=790 = button's visual top), visual diameter
+       44pt (r=22, center y=812), hit target 64pt (r=32, bottom=844) leaves exactly 56pt of margin
+       to the 900 bottom edge before the remaining-time bar -->
+  <g transform="translate(720,812)">
+    <circle r="32" fill="#FFFFFF" fill-opacity="0.06"/>
+    <circle r="22" fill="#FFFFFF" fill-opacity="0.10"/>
+    <circle r="22" fill="none" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="1"/>
+    <g stroke="#FFFFFF" stroke-opacity="0.80" stroke-width="2" stroke-linecap="round">
+      <line x1="-7" y1="-7" x2="7" y2="7"/>
+      <line x1="7" y1="-7" x2="-7" y2="7"/>
+    </g>
+  </g>
+
+  <!-- Remaining-time bar — 2pt tall, full width at bottom edge, 12% opacity, ~70% remaining (shrinks right→left) -->
+  <rect x="0" y="898" width="1008" height="2" fill="#FFFFFF" fill-opacity="0.12"/>
+</svg>

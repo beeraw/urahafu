@@ -1,0 +1,8 @@
+  <key>LSUIElement</key>
+  <true/>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+@@CFBUNDLE_LOCALIZATIONS@@
+  <key>CFBundleAllowMixedLocalizations</key>
+  <true/>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect x="0" y="0" width="1440" height="900" fill="#000000"/>
+
+  <!-- Only the 2pt remaining-time bar is visible; hint, dots, second line and wordmark have all faded out -->
+  <rect x="0" y="898" width="792" height="2" fill="#FFFFFF" fill-opacity="0.12"/>
+</svg>

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="ta" datatype="plaintext" original="urahafu">
+    <header>
+      <note from="urahafu:language-name">தமிழ்</note>
+      <note from="urahafu:direction">ltr</note>
+    </header>
+    <body>
+      <trans-unit id="menu.clean_screen">
+        <source>Clean Screen</source>
+        <target>திரையை சுத்தம் செய்</target>
+        <note>Menu item shown when keyboard-only mode is off. Keep short: appears in the macOS menu bar dropdown.</note>
+      </trans-unit>
+      <trans-unit id="menu.clean_keyboard">
+        <source>Clean Keyboard</source>
+        <target>விசைப்பலகையை சுத்தம் செய்</target>
+        <note>Menu item shown when keyboard-only mode is on (replaces menu.clean_screen). Keep short.</note>
+      </trans-unit>
+      <trans-unit id="menu.keyboard_only_mode">
+        <source>Keyboard Only Mode</source>
+        <target>விசைப்பலகை மட்டும் பயன்முறை</target>
+        <note>Menu checkbox item toggling keyboard-only mode.</note>
+      </trans-unit>
+      <trans-unit id="menu.color">
+        <source>Color</source>
+        <target>நிறம்</target>
+        <note>Menu submenu title grouping the cleaning color choice (Black/White).</note>
+      </trans-unit>
+      <trans-unit id="menu.color.black">
+        <source>Black</source>
+        <target>கருப்பு</target>
+        <note>Menu submenu item: the black cleaning screen color.</note>
+      </trans-unit>
+      <trans-unit id="menu.color.white">
+        <source>White</source>
+        <target>வெள்ளை</target>
+        <note>Menu submenu item: the white cleaning screen color.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock">
+        <source>Auto-Unlock</source>
+        <target>தானாக திறத்தல்</target>
+        <note>Menu submenu title grouping the fail-safe auto-unlock delay choices.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_30s">
+        <source>After 30 s</source>
+        <target>30 வி பிறகு</target>
+        <note>Menu submenu item: auto-unlock after 30 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_60s">
+        <source>After 60 s</source>
+        <target>60 வி பிறகு</target>
+        <note>Menu submenu item: auto-unlock after 60 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.auto_unlock.after_90s">
+        <source>After 90 s</source>
+        <target>90 வி பிறகு</target>
+        <note>Menu submenu item: auto-unlock after 90 seconds.</note>
+      </trans-unit>
+      <trans-unit id="menu.show_icon">
+        <source>Show Icon in Menu Bar</source>
+        <target>மெனு பட்டியில் ஐகானைக் காட்டு</target>
+        <note>Menu checkbox: whether to keep showing the Urahafu icon in the menu bar.</note>
+      </trans-unit>
+      <trans-unit id="menu.open_at_login">
+        <source>Open at Login</source>
+        <target>உள்நுழையும் போது திற</target>
+        <note>Menu checkbox: whether Urahafu launches automatically at login.</note>
+      </trans-unit>
+      <trans-unit id="menu.about">
+        <source>About Urahafu</source>
+        <target>Urahafu பற்றி</target>
+        <note>Menu item opening the About alert.</note>
+      </trans-unit>
+      <trans-unit id="menu.source_code">
+        <source>Source Code on GitHub…</source>
+        <target>GitHub-இல் மூலக் குறியீடு…</target>
+        <note>Menu item opening the project's GitHub page in the browser.</note>
+      </trans-unit>
+      <trans-unit id="menu.quit">
+        <source>Quit Urahafu</source>
+        <target>Urahafu-வை விட்டு வெளியேறு</target>
+        <note>Menu item quitting the app.</note>
+      </trans-unit>
+      <trans-unit id="menu.grant_access">
+        <source>Allow Accessibility Access…</source>
+        <target>அணுகல்தன்மை அணுகலை அனுமதிக்கவும்…</target>
+        <note>Menu item shown above 'Clean Screen'/'Clean Keyboard' (followed by a separator) only while Accessibility access is missing; opens System Settings on the Accessibility pane. Disappears once access is granted.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.title">
+        <source>Hide the Urahafu icon?</source>
+        <target>Urahafu ஐகானை மறைக்கவா?</target>
+        <note>Title of the confirmation alert shown before hiding the menu bar icon.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.text">
+        <source>Urahafu will start cleaning right away each time you open it. To get this menu back, hold Option while opening Urahafu.</source>
+        <target>நீங்கள் திறக்கும்போதெல்லாம் Urahafu உடனடியாக சுத்தம் செய்யத் தொடங்கும். இந்த மெனுவை மீண்டும் பெற, Urahafu-வைத் திறக்கும்போது Option விசையை அழுத்திப் பிடிக்கவும்.</target>
+        <note>Body of the hide-icon confirmation alert. Explains that Urahafu will clean immediately on launch, and how to get the menu back (hold Option while opening).</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.confirm">
+        <source>Hide Icon</source>
+        <target>ஐகானை மறை</target>
+        <note>Default (destructive) button of the hide-icon confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.hide_icon.cancel">
+        <source>Cancel</source>
+        <target>ரத்துசெய்</target>
+        <note>Cancel button of the hide-icon confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="countdown.starting">
+        <source>Cleaning is about to start</source>
+        <target>சுத்தம் விரைவில் தொடங்கும்</target>
+        <note>Label shown above the big countdown digit before cleaning starts. Unlike the digit itself (3, 2, 1) this text does not change between seconds, so it must not reference a specific count.</note>
+      </trans-unit>
+      <trans-unit id="countdown.cancel_hint">
+        <source>Esc or click to cancel</source>
+        <target>ரத்துசெய்ய Esc அல்லது கிளிக் செய்யவும்</target>
+        <note>Small hint below the countdown digit explaining how to cancel it.</note>
+      </trans-unit>
+      <trans-unit id="overlay.wordmark">
+        <source>urahafu</source>
+        <target>urahafu</target>
+        <note>The app's wordmark shown on the full-screen cleaning overlay. This is a proper noun (the app's name) and must stay 'urahafu', unchanged, in every language.</note>
+      </trans-unit>
+      <trans-unit id="overlay.hint.hold_to_unlock">
+        <source>Hold the close button for 2 seconds to unlock</source>
+        <target>திறக்க மூடும் பொத்தானை 2 வினாடிகள் அழுத்திப் பிடிக்கவும்</target>
+        <note>Full-screen overlay hint explaining the hold-to-unlock gesture. Spells out 'close button' in words rather than using the ✕ glyph inline: next to a number ('✕ 2 seconds') the glyph would read as a multiplication sign. Never use ✕ or × in this string.</note>
+      </trans-unit>
+      <trans-unit id="countdown.unlock_explanation">
+        <source>To unlock, hold the close button for 2 seconds</source>
+        <target>திறக்க, மூடும் பொத்தானை 2 வினாடிகள் அழுத்திப் பிடிக்கவும்</target>
+        <note>Countdown screen's explanation of the hold-to-unlock gesture, shown while the countdown to locking is still running. Same wording constraint as overlay.hint.hold_to_unlock: spell out the button, never use ✕ or ×.</note>
+      </trans-unit>
+      <trans-unit id="hud.keyboard_locked">
+        <source>Keyboard locked</source>
+        <target>விசைப்பலகை பூட்டப்பட்டது</target>
+        <note>Keyboard-only mode HUD: compact pill shown while the keyboard is locked. Keep this very short, it renders in a small rounded pill.</note>
+      </trans-unit>
+      <trans-unit id="hud.hold_to_unlock">
+        <source>Hold the button 2 s</source>
+        <target>பொத்தானை 2 வி அழுத்திப் பிடிக்கவும்</target>
+        <note>Keyboard-only mode HUD: compact hold-to-unlock hint next to the ✕ button. Keep very short (HUD pill). Spell out 'button' in words, never use ✕ or × inline next to the number.</note>
+      </trans-unit>
+      <trans-unit id="welcome.title">
+        <source>Welcome to Urahafu</source>
+        <target>Urahafu-க்கு வரவேற்கிறோம்</target>
+        <note>Title of the welcome alert shown once on first launch in menu-bar mode, whatever the Accessibility permission state.</note>
+      </trans-unit>
+      <trans-unit id="welcome.text">
+        <source>Urahafu lets you clean your screen and keyboard without triggering anything. Its icon is in the menu bar, at the top right of the screen. While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock; otherwise the screen unlocks by itself after the delay you chose.</source>
+        <target>Urahafu எதையும் இயக்காமல் உங்கள் திரையையும் விசைப்பலகையையும் சுத்தம் செய்ய உதவுகிறது. அதன் ஐகான் மெனு பட்டியில், திரையின் மேல் வலது மூலையில் உள்ளது. சுத்தம் செய்யும் போது, பூட்டு திறக்க திரையின் கீழே உள்ள மூடு பொத்தானை 2 வினாடிகள் அழுத்திப் பிடிக்கவும்; இல்லையெனில், நீங்கள் தேர்ந்தெடுத்த நேரத்திற்குப் பிறகு திரை தானாகவே திறக்கும்.</target>
+        <note>Body of the welcome alert: explains where to find the menu bar icon (easy to miss) and the hold-to-unlock gesture, since the app only ever shows a small icon otherwise. Shown whatever the Accessibility permission state.</note>
+      </trans-unit>
+      <trans-unit id="welcome.continue">
+        <source>Continue</source>
+        <target>தொடரவும்</target>
+        <note>Button of the welcome alert shown when Accessibility access is still missing; leads into the existing first-launch permission alert (first_launch.*) right after.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.title">
+        <source>Urahafu needs Accessibility access</source>
+        <target>Urahafu-க்கு அணுகல்தன்மை அனுமதி தேவை</target>
+        <note>Title of the first-launch alert asking for Accessibility permission.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.text">
+        <source>To block the keyboard and trackpad while you clean, allow Urahafu in System Settings › Privacy &amp; Security › Accessibility. Urahafu never records or sends what you type, and never connects to the internet.</source>
+        <target>சுத்தம் செய்யும்போது விசைப்பலகை மற்றும் டிராக்பேடைத் தடுக்க, கணினி அமைப்புகள் › தனியுரிமை மற்றும் பாதுகாப்பு › அணுகல்தன்மை-இல் Urahafu-வை அனுமதிக்கவும். நீங்கள் தட்டச்சு செய்வதை Urahafu ஒருபோதும் பதிவு செய்யாது, அனுப்பவும் செய்யாது, மேலும் இணையத்துடன் ஒருபோதும் இணையாது.</target>
+        <note>Body of the first-launch alert. Explains why Accessibility access is needed, the exact System Settings path, and reassures that Urahafu never records keystrokes or connects to the internet. Use the official macOS 13+ System Settings labels for this language (System Settings › Privacy &amp; Security → Accessibility).</note>
+      </trans-unit>
+      <trans-unit id="first_launch.open_settings">
+        <source>Open System Settings</source>
+        <target>கணினி அமைப்புகளைத் திற</target>
+        <note>Default button of the first-launch alert, opens System Settings.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.later">
+        <source>Later</source>
+        <target>பின்னர்</target>
+        <note>Secondary button of the first-launch alert, dismisses without opening Settings.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.ready.text">
+        <source>You're all set! While cleaning, press and hold the close button at the bottom of the screen for 2 seconds to unlock. Otherwise the screen unlocks by itself after the delay you chose.</source>
+        <target>எல்லாம் தயார்! சுத்தம் செய்யும்போது, திரையின் கீழே உள்ள மூடும் பொத்தானை 2 வினாடிகள் அழுத்திப் பிடித்து திறக்கவும். இல்லையெனில், நீங்கள் தேர்ந்தெடுத்த நேரத்திற்குப் பிறகு திரை தானாகவே திறக்கும்.</target>
+        <note>Body of the confirmation alert shown once Accessibility access has been granted, explaining the hold-to-unlock gesture and the fail-safe auto-unlock.</note>
+      </trans-unit>
+      <trans-unit id="first_launch.ready.ok">
+        <source>OK</source>
+        <target>சரி</target>
+        <note>OK button of the first-launch-ready confirmation alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.title">
+        <source>Accessibility access required</source>
+        <target>அணுகல்தன்மை அனுமதி தேவை</target>
+        <note>Title of the error alert shown when Accessibility access is missing at cleaning time.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.text">
+        <source>Urahafu can't block the keyboard without this permission. Cleaning did not start.</source>
+        <target>இந்த அனுமதி இல்லாமல் Urahafu-வால் விசைப்பலகையைத் தடுக்க முடியாது. சுத்தம் தொடங்கவில்லை.</target>
+        <note>Body of the permission-missing error alert.</note>
+      </trans-unit>
+      <trans-unit id="alert.permission_missing.open_settings">
+        <source>Open System Settings</source>
+        <target>கணினி அமைப்புகளைத் திற</target>
+        <note>Default button of the permission-missing alert, opens System Settings.</note>
+      </trans-unit>
+      <trans-unit id="alert.tap_failed.title">
+        <source>Couldn't block the keyboard</source>
+        <target>விசைப்பலகையைத் தடுக்க முடியவில்லை</target>
+        <note>Title of the error alert shown when the keyboard event tap could not be installed.</note>
+      </trans-unit>
+      <trans-unit id="alert.tap_failed.text">
+        <source>Cleaning did not start so you never get stuck. Try again; if it keeps happening, log out and back in.</source>
+        <target>நீங்கள் சிக்கிக்கொள்ளாமல் இருக்க சுத்தம் தொடங்கவில்லை. மீண்டும் முயற்சிக்கவும்; தொடர்ந்தால், வெளியேறி மீண்டும் உள்நுழையவும்.</target>
+        <note>Body of the event-tap-failed error alert, suggests retrying or logging out and back in.</note>
+      </trans-unit>
+      <trans-unit id="alert.secure_input.title">
+        <source>Secure Input is on</source>
+        <target>பாதுகாப்பான உள்ளீடு இயக்கத்தில் உள்ளது</target>
+        <note>Title of the error alert shown when macOS Secure Input is blocking Urahafu.</note>
+      </trans-unit>
+      <trans-unit id="alert.secure_input.text">
+        <source>Another app (often an open password field) is preventing Urahafu from blocking the keyboard. Close that field or app, then try again.</source>
+        <target>மற்றொரு ஆப் (பெரும்பாலும் திறந்திருக்கும் கடவுச்சொல் புலம்) Urahafu விசைப்பலகையைத் தடுப்பதைத் தடுக்கிறது. அந்தப் புலத்தை அல்லது ஆப்பை மூடிவிட்டு, மீண்டும் முயற்சிக்கவும்.</target>
+        <note>Body of the Secure-Input-active error alert, suggests closing the app or field responsible.</note>
+      </trans-unit>
+      <trans-unit id="alert.retry">
+        <source>Try Again</source>
+        <target>மீண்டும் முயற்சி</target>
+        <note>Default button on error alerts, retries the action.</note>
+      </trans-unit>
+      <trans-unit id="alert.cancel">
+        <source>Cancel</source>
+        <target>ரத்துசெய்</target>
+        <note>Cancel button shared by several alerts.</note>
+      </trans-unit>
+      <trans-unit id="about.tagline">
+        <source>Clean your screen and keyboard without triggering anything.</source>
+        <target>எதையும் இயக்காமல் உங்கள் திரையையும் விசைப்பலகையையும் சுத்தம் செய்யுங்கள்.</target>
+        <note>Tagline shown in the About alert, under the app name.</note>
+      </trans-unit>
+      <trans-unit id="about.license">
+        <source>Free software, MIT License</source>
+        <target>இலவச மென்பொருள், MIT உரிமம்</target>
+        <note>License line shown in the About alert.</note>
+      </trans-unit>
+      <trans-unit id="about.view_on_github">
+        <source>View on GitHub</source>
+        <target>GitHub-இல் காண்க</target>
+        <note>Secondary button in the About alert, opens the GitHub repository.</note>
+      </trans-unit>
+      <trans-unit id="about.ok">
+        <source>OK</source>
+        <target>சரி</target>
+        <note>Default (OK) button in the About alert.</note>
+      </trans-unit>
+      <trans-unit id="countdown.locking_in">
+        <source>Locking in {n}</source>
+        <target>{n}-இல் பூட்டப்படுகிறது</target>
+        <note>Keyboard-only mode's countdown label counting down to the keyboard lock, e.g. 'Locking in' 3, 2, 1. {n} is the remaining digit (a single-digit integer, no unit needed unless natural in this language).</note>
+      </trans-unit>
+      <trans-unit id="overlay.hint.secondary">
+        <source>Space: dead-pixel test · Auto-unlock in {seconds} s</source>
+        <target>Space: இறந்த பிக்சல் சோதனை · {seconds} வி-இல் தானாக திறத்தல்</target>
+        <note>Second line of text on the full-screen cleaning overlay: dead-pixel test hint plus the remaining fail-safe auto-unlock time. {seconds} is the number of seconds left, always shown with plain digits (0-9), never native digit forms.</note>
+      </trans-unit>
+      <trans-unit id="about.version">
+        <source>Version {version}</source>
+        <target>பதிப்பு {version}</target>
+        <note>Version line shown in the About alert, e.g. 'Version 1.0.0'. {version} is the crate's semantic version string, inserted verbatim (never translated or reformatted).</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
